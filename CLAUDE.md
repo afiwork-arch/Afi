@@ -14,9 +14,11 @@
   （過去に誤読しかけた実績あり。新規追加時は必ず公式サイトをWebFetch等で確認してから入力する）。
 - ASPクライアント（`src/asp_clients/`）はアフィリエイトリンク取得・レポート取り込み専用。
 - Jinja2 + Markdown で `public/` に静的HTMLを生成し、Cloudflare（Workers static assets、
-  プロジェクト名 `sparkling-waterfall-3cf7`、独自ドメイン `sabanavi-hikaku.com`）に**手動**で
-  デプロイする。CI/CDは未設定 —— コード変更後は毎回「`public/` の中身を再アップロードしてください」
-  とユーザーに伝えること。
+  プロジェクト名 `sparkling-waterfall-3cf7`、独自ドメイン `sabanavi-hikaku.com`）にデプロイする。
+  GitHub Actions（`.github/workflows/deploy.yml`）でmainブランチへのpush時に
+  シート同期→ビルド→デプロイを自動実行する仕組みを用意済み（詳細は下記「デプロイの自動化」）。
+  ただしGitHubリモート・Cloudflare API tokenの登録はユーザー側の一度きりの手作業が必要なため、
+  それが未完了の間は引き続き「`public/` の中身を手動で再アップロードしてください」と伝えること。
 
 ## ビルドコマンド
 
@@ -29,16 +31,13 @@
 シートを直接編集しただけではサイトに反映されない）:
 
 ```bash
-PYTHONPATH="c:/Users/gudej/Desktop/afi" .venv/Scripts/python.exe -c "
-from dotenv import load_dotenv
-load_dotenv(dotenv_path='c:/Users/gudej/Desktop/afi/.env')
-import os, json
-from src.sheets_client import SheetsClient
-sc = SheetsClient(os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON'), os.getenv('GOOGLE_SHEET_ID'), os.getenv('GOOGLE_SHEET_WORKSHEET_NAME'))
-rows = sc.read_all_rows()
-json.dump(rows, open('data/services.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
-"
+.venv/Scripts/python.exe -m src.sync
 ```
+
+`src/sync.py` はシート→JSON反映に加えて、`asp_name`/`asp_program_id` が入っている行があれば
+対応するASPクライアント（`src/asp_clients/`）でアフィリエイトリンクの再取得も試みる
+（未設定のASPは自動でスキップされるだけなので、通常のシート反映用途でもこのコマンドで問題ない）。
+GitHub Actionsのデプロイワークフローもこのコマンドを使っている。
 
 **Windows特有の注意**:
 - `python`/`python3` はWindows Storeのスタブに解決されることがある。実体は
@@ -205,6 +204,32 @@ STEP1（サーバー種類=`server_type`）→ STEP2（予算感、`monthly_pric
   設置済みなのでプロパティ登録は容易なはず。ただしユーザー自身のログイン操作が必要なため
   Claude Codeからは実行不可）、既存記事の加筆による情報量強化、被リンク獲得。
 
+## デプロイの自動化（GitHub Actions → Cloudflare Workers）
+
+`git init` 済み・初回コミット済み（このリポジトリ自体はまだGitHubにpushされていない）。
+`.github/workflows/deploy.yml` が `main` ブランチへのpush時（または手動実行）に
+`python -m src.sync`（シート→JSON同期）→ `python -m src.generate_site`（ビルド）→
+`cloudflare/wrangler-action@v3` での `wrangler deploy`（デプロイ）を自動実行する。
+デプロイ対象は `wrangler.toml`（`name = "sparkling-waterfall-3cf7"`, `[assets] directory = "./public"`）
+で指定済み。既存の独自ドメイン（`sabanavi-hikaku.com`）バインディングはCloudflare側の
+プロジェクト設定として保持されるはずなので、`wrangler.toml`側では明示していない。
+
+**現時点で未完了（ユーザー自身の一度きりの手作業が必要、Claude Codeからは実行不可）**:
+1. GitHubにリモートリポジトリを作成し、このローカルリポジトリをpush
+   （`gh auth login` でのログインが必要。認証済みなら以降は `gh repo create` 等で作成可能）
+2. Cloudflareダッシュボードで Workers 用のAPI tokenを発行（"Edit Cloudflare Workers" テンプレート）
+3. GitHubリポジトリのSecretsに以下を登録（Settings > Secrets and variables > Actions）:
+   - `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`
+   - `GOOGLE_SERVICE_ACCOUNT_JSON`（`config/service_account.json` の中身をそのまま、パスではない）
+   - `GOOGLE_SHEET_ID` / `GOOGLE_SHEET_WORKSHEET_NAME`
+
+上記が完了するまでは、コード変更後は従来通り「`public/` の中身を手動で再アップロードしてください」
+とユーザーに伝えること。完了後はmainにpushするだけで自動デプロイされる。
+
+**ジャンル横展開との関係**: 今後別ジャンル（例: ウォーターサーバー比較）でサイトを増やす場合、
+この一式（`generate_site.py` / `columns.yaml` / `wrangler.toml` / deploy.yml のパターン）を
+別リポジトリ・別Cloudflare Workersプロジェクトとしてコピーすれば同じ仕組みを流用できる設計にしてある。
+
 ## コンプライアンス
 
 - ステマ規制（景品表示法、2023年10月施行）対応で `base.html` にPR表示バー（`.pr-bar`）を常設。
@@ -220,7 +245,9 @@ STEP1（サーバー種類=`server_type`）→ STEP2（予算感、`monthly_pric
 
 ## その他
 
-- このディレクトリは現時点で **gitリポジトリ化されていない**（`git status` はエラーになる）。
-  バージョン管理が必要になったら `git init` から始める必要がある（ユーザーに確認してから）。
+- `git init` 済み・ローカルにコミット履歴あり（ブランチ名は`main`。GitHubへのpushは
+  まだ未実施 —— 詳細は上記「デプロイの自動化」参照）。`.gitignore` で `.env` /
+  `config/service_account.json` / `data/services.json` / `public/` / `.venv/` を除外済み。
+  新しい秘密情報（APIキー等）を追加する際は必ず`.gitignore`に追加してからコミットすること。
 - ASP登録状況: A8.net登録済み。ValueCommerce／AccessTradeは審査結果待ち（承認され次第、
   同様のワークフローでリンクを追加する）。

@@ -79,7 +79,30 @@ python -m src.generate_site
 ```
 
 `public/` フォルダにサイト一式（HTML/CSS）が出力されます。サーバーサイドの処理は無いので、
-`public/` の中身をそのまま Cloudflare Pages や GitHub Pages などの静的ホスティングにデプロイするだけで公開できます。
+`public/` の中身をそのまま Cloudflare Workers（static assets）などの静的ホスティングに
+デプロイするだけで公開できます。
+
+## デプロイの自動化（GitHub Actions）
+
+`main` ブランチにpushすると、`.github/workflows/deploy.yml` が
+「スプレッドシート同期 → サイトビルド → Cloudflare Workersへデプロイ」を自動実行します。
+有効にするには、最初に一度だけ以下の設定が必要です。
+
+1. GitHubにこのリポジトリをpushする（`gh auth login` でログイン後、`gh repo create` 等）
+2. Cloudflareダッシュボードで Workers 用のAPI tokenを発行する
+   （「My Profile」→「API Tokens」→「Edit Cloudflare Workers」テンプレート）
+3. GitHubリポジトリの Settings → Secrets and variables → Actions に、以下のSecretsを登録する
+
+   | Secret名 | 値 |
+   |---|---|
+   | `CLOUDFLARE_API_TOKEN` | 手順2で発行したトークン |
+   | `CLOUDFLARE_ACCOUNT_ID` | CloudflareダッシュボードのアカウントID |
+   | `GOOGLE_SERVICE_ACCOUNT_JSON` | `config/service_account.json` の中身をそのまま貼り付け（ファイルパスではない） |
+   | `GOOGLE_SHEET_ID` | `.env` の `GOOGLE_SHEET_ID` と同じ値 |
+   | `GOOGLE_SHEET_WORKSHEET_NAME` | `.env` の `GOOGLE_SHEET_WORKSHEET_NAME` と同じ値 |
+
+設定が完了するまでは、これまで通り `public/` フォルダの中身を手動でCloudflareにアップロードして
+公開してください。
 
 ローカルでの見た目確認:
 
