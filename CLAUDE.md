@@ -206,29 +206,50 @@ STEP1（サーバー種類=`server_type`）→ STEP2（予算感、`monthly_pric
 
 ## デプロイの自動化（GitHub Actions → Cloudflare Workers）
 
-`git init` 済み・初回コミット済み（このリポジトリ自体はまだGitHubにpushされていない）。
-`.github/workflows/deploy.yml` が `main` ブランチへのpush時（または手動実行）に
-`python -m src.sync`（シート→JSON同期）→ `python -m src.generate_site`（ビルド）→
-`cloudflare/wrangler-action@v3` での `wrangler deploy`（デプロイ）を自動実行する。
-デプロイ対象は `wrangler.toml`（`name = "sparkling-waterfall-3cf7"`, `[assets] directory = "./public"`）
-で指定済み。既存の独自ドメイン（`sabanavi-hikaku.com`）バインディングはCloudflare側の
-プロジェクト設定として保持されるはずなので、`wrangler.toml`側では明示していない。
+稼働中。GitHubリポジトリ `https://github.com/afiwork-arch/Afi`（ブランチ`main`）にpushすると、
+`.github/workflows/deploy.yml` が `python -m src.sync`（シート→JSON同期）→
+`python -m src.generate_site`（ビルド）→ `cloudflare/wrangler-action@v3` での
+`wrangler deploy`（デプロイ）を自動実行する。デプロイ対象は `wrangler.toml`
+（`name = "sparkling-waterfall-3cf7"`, `[assets] directory = "./public"`）で指定済み。
+GitHubリポジトリのSecretsに `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` /
+`GOOGLE_SERVICE_ACCOUNT_JSON`（ファイルの中身） / `GOOGLE_SHEET_ID` /
+`GOOGLE_SHEET_WORKSHEET_NAME` を登録済み。`gh auth status` で認証済み（`gh run watch`
+で実行中のワークフローを直接監視できる）。もう「`public/` を手動アップロードしてください」と
+案内する必要はない —— コードやコンテンツの変更は `git add` → `git commit` → `git push` で
+自動的に本番へ反映される。
 
-**現時点で未完了（ユーザー自身の一度きりの手作業が必要、Claude Codeからは実行不可）**:
-1. GitHubにリモートリポジトリを作成し、このローカルリポジトリをpush
-   （`gh auth login` でのログインが必要。認証済みなら以降は `gh repo create` 等で作成可能）
-2. Cloudflareダッシュボードで Workers 用のAPI tokenを発行（"Edit Cloudflare Workers" テンプレート）
-3. GitHubリポジトリのSecretsに以下を登録（Settings > Secrets and variables > Actions）:
-   - `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`
-   - `GOOGLE_SERVICE_ACCOUNT_JSON`（`config/service_account.json` の中身をそのまま、パスではない）
-   - `GOOGLE_SHEET_ID` / `GOOGLE_SHEET_WORKSHEET_NAME`
+**wrangler.toml の `html_handling` はデフォルト（未指定）のままにすること**。
+`"none"` にすると `.html` 拡張子への307リダイレクトは消えるが、代わりに
+`/`（ルート）や `/articles/` のようなディレクトリ配下の `index.html` 自動解決も
+一緒に無効化されトップページが404になる（一度実際に起きた）。この冗長リダイレクト自体は
+実害が小さいため、対応するならサイト内の全リンク・sitemap.xmlを拡張子なしURLに揃える
+テンプレート全体の変更とセットで行うこと。
 
-上記が完了するまでは、コード変更後は従来通り「`public/` の中身を手動で再アップロードしてください」
-とユーザーに伝えること。完了後はmainにpushするだけで自動デプロイされる。
+## ジャンル横展開とおすすめ企業リスト
 
-**ジャンル横展開との関係**: 今後別ジャンル（例: ウォーターサーバー比較）でサイトを増やす場合、
-この一式（`generate_site.py` / `columns.yaml` / `wrangler.toml` / deploy.yml のパターン）を
-別リポジトリ・別Cloudflare Workersプロジェクトとしてコピーすれば同じ仕組みを流用できる設計にしてある。
+**アーキテクチャ**: 別ジャンル用に別リポジトリ/別ドメインを作るのではなく、**同じサイト・同じ
+スプレッドシート内で複数ジャンルを扱う**設計にしてある（1つのドメインに検索の信頼・被リンクを
+集約したほうが新規ドメインを増やすより効率的という判断。ユーザーもサイト名変更を許容している）。
+
+- `config/columns.yaml` の `genres` リスト（`key`/`label`/`path`）がジャンル定義。各行の `genre`
+  列（columns.yamlの列定義にあり）がどのジャンルに属するかを示す。
+- `generate_site.py` の `build()` が `genres` の数だけ比較ページを生成する
+  （`path: ""` → `public/index.html`、`path: "vpn/"` → `public/vpn/index.html`）。
+  ナビ（`base.html`）・sitemap・パンくずJSON-LD（`review.html`/`article.html`）はすべて
+  `genres` リスト駆動なので、ジャンルを追加すればこれらは自動的に追従する。
+- **新ジャンルを追加する手順**:
+  1. `templates/index.html` のhero-lead/intro/FAQ/もっと詳しく知りたい方へ（現状レンタルサーバー
+     向けの文言が直書き）をそのジャンル向けに書き換える —— ここが唯一「genresリストに足すだけでは
+     終わらない」部分。中身が無いまま公開すると別ジャンルのページに前のジャンルの説明文が出てしまう。
+  2. `config/columns.yaml` の `genres` リストに新しいエントリを追加
+  3. スプレッドシートの新規行に該当する `genre` 値を設定
+  4. そのジャンル向けの比較記事・レビューを追加
+
+**おすすめ企業リスト（`RECOMMENDED_COMPANIES.md`）**: まだアフィリエイトリンクが無い追加候補の
+企業を一覧化したファイル。Claude Codeが調査（公式サイトURLを確認済みのもの）のうえで追記し、
+ユーザーがASP側で申請してリンクを共有したら、スプレッドシートに反映してこのリストから削除する
+という運用（ファイル冒頭に運用フローを明記済み）。新しい会社を追加する作業（記事追加、ジャンル
+横展開など）のたびに、このファイルの内容も見直して更新すること。
 
 ## コンプライアンス
 
