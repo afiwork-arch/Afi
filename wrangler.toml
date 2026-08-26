@@ -1,0 +1,5 @@
+name = "sparkling-waterfall-3cf7"
+compatibility_date = "2026-08-27"
+
+[assets]
+directory = "./public"

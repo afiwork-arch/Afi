@@ -1,0 +1,36 @@
+[
+  {
+    "service_name": "サンプルサーバーA",
+    "company": "サンプル株式会社",
+    "monthly_price": "990",
+    "setup_fee": "0",
+    "disk_capacity": "300GB SSD",
+    "transfer_capacity": "無制限",
+    "server_type": "共用",
+    "free_ssl": "あり",
+    "official_url": "https://example.com/server-a",
+    "asp_name": "バリューコマース",
+    "asp_program_id": "SAMPLE_EC_CODE_A",
+    "affiliate_link": "",
+    "asp_price_snapshot": "",
+    "last_synced_at": "",
+    "notes": "手動入力サンプル行。実データに置き換えてください。"
+  },
+  {
+    "service_name": "サンプルサーバーB",
+    "company": "サンプル合同会社",
+    "monthly_price": "1320",
+    "setup_fee": "3000",
+    "disk_capacity": "500GB SSD",
+    "transfer_capacity": "無制限",
+    "server_type": "VPS",
+    "free_ssl": "あり",
+    "official_url": "https://example.com/server-b",
+    "asp_name": "A8.net",
+    "asp_program_id": "A8_PROGRAM_ID_B",
+    "affiliate_link": "",
+    "asp_price_snapshot": "",
+    "last_synced_at": "",
+    "notes": "A8.netはCSVレポート取り込み運用（data/a8net_reports/ にCSVを置く）"
+  }
+]

@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+{% block title %}{{ genre }}比較【{{ generated_at[:7] }}更新】| {{ site_title }}{% endblock %}
+{% block structured_data %}
+{% set faq_ld = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "レンタルサーバーとドメインは別々に契約する必要がありますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "別々でも契約できますが、初めての方は同じ会社でまとめて契約すると管理が簡単です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "共用サーバーとVPSはどちらを選べばいいですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "初めての方は共用サーバーで十分なケースがほとんどです。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "表示されている月額料金は、ずっとこの金額ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "多くの場合、初回契約時の割引価格です。更新後は料金が上がることがあるため注意が必要です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "今使っているサーバーから乗り換えることはできますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "多くの会社が移転サポートを用意しています。"
+      }
+    }
+  ]
+} %}
+<script type="application/ld+json">{{ faq_ld | tojson }}</script>
+{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>{{ genre }}比較 | {{ site_title }}</h1>
+  <p class="hero-lead">
+    {{ site_title }}は、月額料金・容量・機能をスプレッドシートで管理し、公式サイトの最新情報をもとに更新している比較サイトです。
+    価格だけでなく<span class="kw">「どんな人に向いているか」</span>も比較表にまとめているので、初めての1社選びにご活用ください。
+  </p>
+  <p class="updated-at">最終更新: {{ generated_at }}</p>
+</section>
+
+<section class="intro">
+  <p>
+    レンタルサーバーは似たようなプランが多く、価格表だけを見ても違いが分かりにくいものです。
+    まずは<span class="kw">「初期費用と更新後の料金は分けて確認する」</span><span class="kw">「共用サーバーで十分か、VPSが必要か」</span>
+    といった基本を押さえておくと、比較表の数字の意味が理解しやすくなります
+    (詳しくは<a href="articles/how-to-choose.html">レンタルサーバーの選び方</a>、
+    <a href="articles/shared-vs-vps.html">共用サーバーとVPSの違い</a>で解説しています)。
+  </p>
+  <p>
+    以下の比較表では、今回取り上げた{{ rows|length }}社の月額料金・容量・特長を一覧にしています。
+    各社の詳しいレビューは表の下にまとめていますので、気になるサービスがあれば
+    あわせてご確認ください。
+  </p>
+</section>
+
+<section class="diagnosis">
+  <h2>かんたん診断: あなたに合うのは?</h2>
+
+  <div class="diag-panels">
+    <div class="diag-panel" data-step="1">
+      <p class="diag-intro"><span class="diag-step-num">STEP 1</span>サーバーの種類は？</p>
+      <div class="diag-buttons diag-buttons-step1">
+        {% set seen_types = [] %}
+        {% for row in rows %}
+        {% set stype = row.get("server_type") %}
+        {% if stype and stype not in seen_types %}
+        {% set _ = seen_types.append(stype) %}
+        <button type="button" class="diag-btn diag-btn-lg" data-step1-target="{{ stype }}">{{ stype }}</button>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="diag-panel" id="diag-step-budget" hidden>
+      <button type="button" class="diag-back">← 戻る</button>
+      <p class="diag-intro"><span class="diag-step-num">STEP 2</span>予算感は？</p>
+      <div class="diag-buttons diag-buttons-budget">
+        <button type="button" class="diag-btn" data-budget-target="low">〜500円</button>
+        <button type="button" class="diag-btn" data-budget-target="mid">500〜1000円</button>
+        <button type="button" class="diag-btn" data-budget-target="high">1000円以上・こだわらない</button>
+      </div>
+    </div>
+
+    <div class="diag-panel" id="diag-step-trait" hidden>
+      <button type="button" class="diag-back">← 戻る</button>
+      <p class="diag-intro"><span class="diag-step-num">STEP 3</span>重視するポイントは？</p>
+      {% set seen_types2 = [] %}
+      {% for row in rows %}
+      {% set stype = row.get("server_type") %}
+      {% if stype and stype not in seen_types2 %}
+      {% set _ = seen_types2.append(stype) %}
+      <div class="diag-buttons" data-step2-group="{{ stype }}" hidden>
+        {% for r in rows %}
+        {% if r.get("server_type") == stype and r.get("diagnosis_label") and r.get("slug") %}
+        {% set price = r.get("monthly_price") | int(-1) %}
+        {% set budget = "low" if price >= 0 and price < 500 else ("mid" if price >= 0 and price < 1000 else "high") %}
+        <button type="button" class="diag-btn" data-target="{{ r.get('slug') }}" data-budget="{{ budget }}">{{ r.get("diagnosis_label") }}</button>
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="diag-panel diag-panel-result" id="diag-result" hidden>
+      <button type="button" class="diag-back">← 戻る</button>
+      {% for row in rows %}
+      {% if row.get("slug") %}
+      <div class="diag-result-card" data-slug="{{ row.get('slug') }}" hidden>
+        <p class="diag-result-label">あなたにおすすめ</p>
+        <h3>{{ row.get("service_name") }}</h3>
+        {% if row.get("recommend_comment") %}<p>{{ row.get("recommend_comment") }}</p>{% endif %}
+        {% set price = row.get("monthly_price") %}
+        {% if price is not none and price != "" %}
+        <p class="diag-result-price">月額 <span class="price">{{ price }}<small>円/月〜</small></span></p>
+        {% endif %}
+        <a class="cta" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
+           rel="nofollow sponsored" target="_blank">{{ row.get("service_name") }}を見る</a>
+        <a class="review-more-link" href="reviews/{{ row.get('slug') }}.html">詳細レビューを見る →</a>
+      </div>
+      {% endif %}
+      {% endfor %}
+      <button type="button" class="diag-reset">↺ もう一度診断する</button>
+    </div>
+  </div>
+</section>
+
+<section class="compare">
+  <h2>{{ genre }}比較表</h2>
+  <div class="tier-toolbar" id="tier-toolbar">
+    <span class="sort-label">表示するプラン:</span>
+    <div class="sort-group">
+      <button type="button" class="sort-btn is-active" data-tier="low">LOW(入門)</button>
+      <button type="button" class="sort-btn" data-tier="mid">MIDDLE(中位)</button>
+      <button type="button" class="sort-btn" data-tier="high">HIGH(上位)</button>
+    </div>
+  </div>
+  <p class="tier-note">
+    各社、入門プランだけでなく中位・上位プランの料金も比較できます。上位プランが無い会社は「―」と表示されます。
+  </p>
+  <div class="sort-toolbar">
+    <span class="sort-label">並び替え:</span>
+    <div class="sort-group">
+      <button type="button" class="sort-btn is-active" data-sort="default">標準</button>
+      <button type="button" class="sort-btn" data-sort="price-asc">月額が安い順</button>
+      <button type="button" class="sort-btn" data-sort="price-desc">月額が高い順</button>
+      <button type="button" class="sort-btn" data-sort="disk-desc">容量が多い順</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="compare-table" id="compare-table">
+      <thead>
+        <tr>
+          <th class="col-service">サービス</th>
+          <th class="col-price">月額料金</th>
+          <th class="col-spec">スペック</th>
+          <th class="col-ssl">無料SSL</th>
+          <th class="col-cta">公式サイト</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        {% set stype = row.get("server_type") %}
+        <tr
+          data-price="{{ row.get('_price_sort') }}"
+          data-disk="{{ row.get('_disk_sort') }}"
+          data-price-low="{{ row.get('_price_sort') }}"
+          data-price-mid="{{ row.get('_price_sort_mid') }}"
+          data-price-high="{{ row.get('_price_sort_high') }}"
+          data-disk-low="{{ row.get('_disk_sort') }}"
+          data-disk-mid="{{ row.get('_disk_sort_mid') }}"
+          data-disk-high="{{ row.get('_disk_sort_high') }}"
+          data-order="{{ loop.index0 }}">
+          <td data-label="サービス" class="col-service">
+            <div class="cell-service-name">{{ row.get("service_name") }}</div>
+            {% if row.get("company") %}<div class="cell-company">{{ row.get("company") }}</div>{% endif %}
+            {% if row.get("recommend_comment") %}<p class="cell-comment">{{ row.get("recommend_comment") }}</p>{% endif %}
+          </td>
+          <td data-label="月額料金" class="col-price">
+            {% for tier in ["low", "mid", "high"] %}
+            {% set suffix = "" if tier == "low" else "_" ~ tier %}
+            {% set price = row.get("monthly_price" ~ suffix) %}
+            {% set fee = row.get("setup_fee" ~ suffix) %}
+            {% set plan_name = row.get("plan_name" ~ suffix) %}
+            <div class="tier-variant" data-tier="{{ tier }}"{% if tier != "low" %} hidden{% endif %}>
+              {% if plan_name %}<div class="cell-plan-name">{{ plan_name }}</div>{% endif %}
+              {% if price is not none and price != "" %}
+                <span class="price">{{ price }}<small>円/月〜</small></span>
+              {% else %}―{% endif %}
+              {% if fee is not none and fee != "" %}
+                <div class="cell-subtext">初期費用 {{ fee }}円</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </td>
+          <td data-label="スペック" class="col-spec">
+            {% for tier in ["low", "mid", "high"] %}
+            {% set suffix = "" if tier == "low" else "_" ~ tier %}
+            {% set disk = row.get("disk_capacity" ~ suffix) %}
+            {% set cpu_mem = row.get("cpu_memory" ~ suffix) %}
+            {% set tier_price = row.get("monthly_price" ~ suffix) %}
+            {% set has_tier = tier == "low" or (tier_price is not none and tier_price != "") %}
+            <div class="tier-variant" data-tier="{{ tier }}"{% if tier != "low" %} hidden{% endif %}>
+              {% if has_tier %}
+                {% if cpu_mem %}<div>CPU/メモリ: {{ cpu_mem }}</div>{% endif %}
+                {% if disk %}<div>容量: {{ disk }}</div>{% endif %}
+                {% if stype %}<div>種別: {{ stype }}</div>{% endif %}
+                {% if row.get("storage_type") %}<div>ストレージ: {{ row.get("storage_type") }}</div>{% endif %}
+                {% if row.get("backup") %}<div>バックアップ: {{ row.get("backup") }}</div>{% endif %}
+                {% if not disk and not stype and not cpu_mem %}―{% endif %}
+              {% else %}―{% endif %}
+            </div>
+            {% endfor %}
+          </td>
+          <td data-label="無料SSL" class="col-ssl">{{ row.get("free_ssl") or "-" }}</td>
+          <td data-label="公式サイト" class="col-cta">
+            <a class="cta cta-small" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
+               rel="nofollow sponsored" target="_blank">見る</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if rows|length > 3 %}
+  <button type="button" class="table-more-btn" id="table-more-btn" data-limit="3" hidden>
+    もっと見る(あと{{ rows|length - 3 }}社)
+  </button>
+  {% endif %}
+  <p class="table-note">
+    ※ 表示価格は各社の代表的な入門プランの税込月額です。期間限定キャンペーン価格を含む場合があります。
+    最新の正確な金額・特典は必ず公式サイトでご確認ください。
+  </p>
+</section>
+
+{% set review_rows = rows | selectattr("detail_review") | selectattr("slug") | list %}
+<section class="reviews">
+  <h2>各社の特徴を詳しく</h2>
+
+  <div class="review-select-wrap">
+    <label class="review-select-label" for="review-select">企業を選択</label>
+    <select class="review-select" id="review-select">
+      {% for row in review_rows %}
+      <option value="{{ row.get('slug') }}">{{ row.get("service_name") }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="review-panels">
+    {% for row in review_rows %}
+    <article class="review-panel" data-slug="{{ row.get('slug') }}" {% if not loop.first %}hidden{% endif %}>
+      <h3>{{ row.get("service_name") }}</h3>
+      {% if row.get("recommend_comment") %}<p class="review-panel-comment">{{ row.get("recommend_comment") }}</p>{% endif %}
+      <p>{{ row.get("detail_review") }}</p>
+      <a class="cta cta-small" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
+         rel="nofollow sponsored" target="_blank">{{ row.get("service_name") }}の公式サイトを見る</a>
+      <a class="review-more-link" href="reviews/{{ row.get('slug') }}.html">{{ row.get("service_name") }}の詳細レビューを見る →</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="faq">
+  <h2>よくある質問</h2>
+  <div class="faq-item">
+    <p class="faq-q">Q. レンタルサーバーとドメインは別々に契約する必要がありますか？</p>
+    <p class="faq-a">A. 別々でも契約できますが、初めての方は同じ会社でまとめて契約すると管理が簡単です。
+      詳しくは<span class="kw">「<a href="articles/how-to-start-wordpress.html">WordPressブログの始め方</a>」</span>で解説しています。</p>
+  </div>
+  <div class="faq-item">
+    <p class="faq-q">Q. 共用サーバーとVPSはどちらを選べばいいですか？</p>
+    <p class="faq-a">A. 初めての方は共用サーバーで十分なケースがほとんどです。違いは
+      <span class="kw">「<a href="articles/shared-vs-vps.html">共用サーバーとVPSの違い</a>」</span>で解説しています。</p>
+  </div>
+  <div class="faq-item">
+    <p class="faq-q">Q. 表示されている月額料金は、ずっとこの金額ですか？</p>
+    <p class="faq-a">A. 多くの場合、初回契約時の割引価格です。更新後の料金については
+      <span class="kw">「<a href="articles/hidden-costs.html">見落としがちな更新料金の注意点</a>」</span>で解説しています。</p>
+  </div>
+  <div class="faq-item">
+    <p class="faq-q">Q. 今使っているサーバーから乗り換えることはできますか？</p>
+    <p class="faq-a">A. 多くの会社が移転サポートを用意しています。詳しくは
+      <span class="kw">「<a href="articles/server-migration.html">サーバーの乗り換えは難しい？</a>」</span>をご覧ください。</p>
+  </div>
+</section>
+
+<section class="more-articles">
+  <h2>もっと詳しく知りたい方へ</h2>
+  <div class="more-articles-grid">
+    <a href="articles/xserver-vs-conoha-wing.html">エックスサーバーとConoHa WINGを比較</a>
+    <a href="articles/lolipop-vs-sakura.html">ロリポップとさくらのレンタルサーバを比較</a>
+    <a href="articles/site-speed.html">サイトの表示速度はサーバーで変わる？</a>
+    <a href="articles/security-checklist.html">セキュリティ機能で確認すべき5つのポイント</a>
+    <a href="articles/free-trial.html">無料お試し期間・返金保証は使うべき？</a>
+  </div>
+  <a class="all-articles-link" href="articles/">お役立ち記事の一覧を見る →</a>
+</section>
+{% endblock %}

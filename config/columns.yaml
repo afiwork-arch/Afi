@@ -1,0 +1,173 @@
+# スプレッドシート／JSONの列（比較項目）定義。
+# ジャンルを増やす場合は columns.yaml のコピーを作るか、genre ごとにキーを分けて拡張する。
+#
+# type: manual  → 各社公式サイトを見て人が入力・更新する列
+# type: asp     → ASPクライアントが埋める列（提携リンク・ASP側の商品データなど）
+# type: system  → スクリプトが自動で埋める列（更新日時など）
+#
+# public: true   → 比較ページの表に表示する列
+# public: false  → 内部管理用（サイトには表示しない）
+
+genre: レンタルサーバー
+
+columns:
+  - key: service_name
+    label: サービス名
+    type: manual
+    required: true
+    public: true
+
+  - key: slug
+    label: URLスラッグ（英数字。個別レビューページのURLに使用）
+    type: manual
+    public: false
+
+  - key: recommend_comment
+    label: おすすめポイント（一言）
+    type: manual
+    public: true
+
+  - key: diagnosis_label
+    label: "診断ツール用ラベル（例: 安さ重視／速度重視）"
+    type: manual
+    public: true
+
+  - key: detail_review
+    label: 詳細レビュー（3〜5文）
+    type: manual
+    public: true
+
+  - key: company
+    label: 運営会社
+    type: manual
+    public: true
+
+  - key: monthly_price
+    label: 月額料金（税込・円）
+    type: manual
+    public: true
+
+  - key: setup_fee
+    label: 初期費用（税込・円）
+    type: manual
+    public: true
+
+  - key: disk_capacity
+    label: ディスク容量
+    type: manual
+    public: true
+
+  - key: plan_name_mid
+    label: 中位プラン名（LOW/MIDDLE/HIGH比較用。無ければ空欄）
+    type: manual
+    public: true
+
+  - key: monthly_price_mid
+    label: 中位プラン月額料金（税込・円）
+    type: manual
+    public: true
+
+  - key: setup_fee_mid
+    label: 中位プラン初期費用（税込・円）
+    type: manual
+    public: true
+
+  - key: disk_capacity_mid
+    label: 中位プランディスク容量
+    type: manual
+    public: true
+
+  - key: plan_name_high
+    label: 上位プラン名（LOW/MIDDLE/HIGH比較用。無ければ空欄）
+    type: manual
+    public: true
+
+  - key: monthly_price_high
+    label: 上位プラン月額料金（税込・円）
+    type: manual
+    public: true
+
+  - key: setup_fee_high
+    label: 上位プラン初期費用（税込・円）
+    type: manual
+    public: true
+
+  - key: disk_capacity_high
+    label: 上位プランディスク容量
+    type: manual
+    public: true
+
+  - key: cpu_memory
+    label: CPU/メモリ（主にVPS向け。共用サーバーは空欄でよい）
+    type: manual
+    public: true
+
+  - key: cpu_memory_mid
+    label: 中位プランCPU/メモリ
+    type: manual
+    public: true
+
+  - key: cpu_memory_high
+    label: 上位プランCPU/メモリ
+    type: manual
+    public: true
+
+  - key: storage_type
+    label: ストレージ種別（NVMe SSD/SSDなど。未確認なら空欄）
+    type: manual
+    public: true
+
+  - key: backup
+    label: 自動バックアップ（無料標準/有料オプション/なし。未確認なら空欄）
+    type: manual
+    public: true
+
+  - key: transfer_capacity
+    label: 転送量目安
+    type: manual
+    public: true
+
+  - key: server_type
+    label: サーバー種別（共用/VPS/クラウド）
+    type: manual
+    public: true
+
+  - key: free_ssl
+    label: 無料SSL
+    type: manual
+    public: true
+
+  - key: official_url
+    label: 公式サイトURL
+    type: manual
+    public: false
+
+  - key: asp_name
+    label: 提携ASP（A8.net/バリューコマース/AccessTrade）
+    type: manual
+    public: false
+
+  - key: asp_program_id
+    label: ASPプログラムID・ECコード
+    type: manual
+    public: false
+
+  - key: affiliate_link
+    label: アフィリエイトリンク
+    type: asp
+    public: false
+
+  - key: asp_price_snapshot
+    label: ASP側価格スナップショット（VC商品APIのみ）
+    type: asp
+    public: false
+
+  - key: last_synced_at
+    label: 最終同期日時
+    type: system
+    public: false
+
+  - key: notes
+    label: 備考
+    type: manual
+    public: false

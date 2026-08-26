@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ site_title }}は、レンタルサーバー各社の料金・容量・機能を比較できるサイトです。公式サイトの最新情報をもとに更新しています。{% endblock %}">
+  <meta name="google-site-verification" content="o7Zcfegm3i3a5B-HjU4RobohQUi8L4fvSlwDsaI-3PA" />
+  <link rel="icon" href="{{ root }}favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="{{ root }}favicon.ico" sizes="any">
+  <link rel="icon" href="{{ root }}favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="{{ root }}favicon-16x16.png" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="{{ root }}apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ root }}style.css">
+  {% set website_ld = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": site_title,
+    "url": site_url ~ "/"
+  } %}
+  <script type="application/ld+json">{{ website_ld | tojson }}</script>
+  {% block structured_data %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-title" href="{{ root }}index.html">{{ site_title }}</a>
+      <nav>
+        <a href="{{ root }}index.html">比較表</a>
+        <a href="{{ root }}articles/">お役立ち記事</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="pr-bar">
+    <span class="pr-badge">PR</span>
+    本サイトはアフィリエイト広告(プロモーション)を含みます。詳しくは<a href="{{ root }}disclaimer.html">免責事項</a>をご覧ください。
+  </div>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <p>本サイトはアフィリエイトプログラムにより収益を得ています。掲載の料金・仕様は変更される場合があるため、必ず公式サイトで最新情報をご確認ください。</p>
+      <nav class="footer-nav">
+        <a href="{{ root }}about.html">運営者情報</a>
+        <a href="{{ root }}privacy.html">プライバシーポリシー</a>
+        <a href="{{ root }}disclaimer.html">免責事項</a>
+        <a href="{{ root }}contact.html">お問い合わせ</a>
+      </nav>
+      <p class="copyright">&copy; {{ site_title }}</p>
+    </div>
+  </footer>
+
+  <script src="{{ root }}site.js" defer></script>
+</body>
+</html>

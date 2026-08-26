@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ row.get("service_name") }}の評判・料金・特徴を解説 | {{ site_title }}{% endblock %}
+{% block description %}{{ row.get("service_name") }}の月額料金・容量・特徴を{{ site_title }}が解説します。{{ row.get("recommend_comment") or "" }}{% endblock %}
+{% block structured_data %}
+{% set breadcrumb_ld = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "比較表", "item": site_url ~ "/index.html"},
+    {"@type": "ListItem", "position": 2, "name": row.get("service_name")}
+  ]
+} %}
+<script type="application/ld+json">{{ breadcrumb_ld | tojson }}</script>
+{% endblock %}
+{% block content %}
+<nav class="breadcrumb">
+  <a href="{{ root }}index.html">比較表</a> &gt; {{ row.get("service_name") }}
+</nav>
+
+<article class="review-page">
+  <h1>{{ row.get("service_name") }}の評判・料金・特徴</h1>
+  {% if row.get("company") %}<p class="review-company">運営: {{ row.get("company") }}</p>{% endif %}
+
+  <div class="review-summary">
+    {% set price = row.get("monthly_price") %}
+    {% if price is not none and price != "" %}
+    <div class="summary-item">
+      <span class="summary-label">月額料金</span>
+      <span class="price">{{ price }}<small>円/月〜</small></span>
+    </div>
+    {% endif %}
+    {% set setup_fee = row.get("setup_fee") %}
+    {% if setup_fee is not none and setup_fee != "" %}
+    <div class="summary-item">
+      <span class="summary-label">初期費用</span>
+      <span class="summary-value">{{ setup_fee }}円</span>
+    </div>
+    {% endif %}
+    {% if row.get("disk_capacity") %}
+    <div class="summary-item">
+      <span class="summary-label">ディスク容量</span>
+      <span class="summary-value">{{ row.get("disk_capacity") }}</span>
+    </div>
+    {% endif %}
+    {% if row.get("cpu_memory") %}
+    <div class="summary-item">
+      <span class="summary-label">CPU/メモリ</span>
+      <span class="summary-value">{{ row.get("cpu_memory") }}</span>
+    </div>
+    {% endif %}
+    {% if row.get("server_type") %}
+    <div class="summary-item">
+      <span class="summary-label">サーバー種別</span>
+      <span class="summary-value">{{ row.get("server_type") }}</span>
+    </div>
+    {% endif %}
+    {% if row.get("storage_type") %}
+    <div class="summary-item">
+      <span class="summary-label">ストレージ</span>
+      <span class="summary-value">{{ row.get("storage_type") }}</span>
+    </div>
+    {% endif %}
+    {% if row.get("backup") %}
+    <div class="summary-item">
+      <span class="summary-label">自動バックアップ</span>
+      <span class="summary-value">{{ row.get("backup") }}</span>
+    </div>
+    {% endif %}
+    {% if row.get("free_ssl") %}
+    <div class="summary-item">
+      <span class="summary-label">無料SSL</span>
+      <span class="summary-value">{{ row.get("free_ssl") }}</span>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if row.get("recommend_comment") %}
+  <p class="review-lead">{{ row.get("recommend_comment") }}</p>
+  {% endif %}
+
+  <a class="cta" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
+     rel="nofollow sponsored" target="_blank">{{ row.get("service_name") }}の公式サイトを見る</a>
+
+  {% if row.get("detail_review") %}
+  <div class="review-body">
+    <h2>{{ row.get("service_name") }}の詳しい特徴</h2>
+    <p>{{ row.get("detail_review") }}</p>
+  </div>
+  {% endif %}
+
+  <p class="review-back"><a href="{{ root }}index.html">← 他社と比較する(比較表に戻る)</a></p>
+</article>
+{% endblock %}
