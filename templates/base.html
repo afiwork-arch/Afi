@@ -29,7 +29,9 @@
     <div class="site-header-inner">
       <a class="site-title" href="{{ root }}index.html">{{ site_title }}</a>
       <nav>
-        <a href="{{ root }}index.html">比較表</a>
+        {% for g in genres %}
+        <a href="{{ root }}{{ g.path }}index.html">{{ g.label }}比較</a>
+        {% endfor %}
         <a href="{{ root }}articles/">お役立ち記事</a>
       </nav>
     </div>

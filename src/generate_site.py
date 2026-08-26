@@ -45,7 +45,7 @@ def load_rows() -> list[dict]:
         return json.load(f)
 
 
-def load_articles() -> list[dict]:
+def load_articles(default_genre: str) -> list[dict]:
     articles = []
     if not CONTENT_DIR.exists():
         return articles
@@ -58,6 +58,7 @@ def load_articles() -> list[dict]:
                 "title": post.get("title", md_path.stem),
                 "slug": post.get("slug", md_path.stem),
                 "date": str(post.get("date", "")),
+                "genre": post.get("genre", default_genre),
                 "html_content": html_content,
             }
         )
@@ -103,12 +104,16 @@ def load_pages() -> list[dict]:
 
 def build() -> None:
     config = load_columns()
+    genres = config["genres"]
+    default_genre = genres[0]["key"]
+
     rows = load_rows()
-    articles = load_articles()
+    articles = load_articles(default_genre)
     pages = load_pages()
     public_columns = [c for c in config["columns"] if c.get("public")]
 
     for row in rows:
+        row["genre"] = row.get("genre") or default_genre
         for tier_suffix in ("", "_mid", "_high"):
             price = row.get(f"monthly_price{tier_suffix}")
             row[f"_price_sort{tier_suffix}"] = (
@@ -121,6 +126,9 @@ def build() -> None:
     OUTPUT_DIR.mkdir(parents=True)
     (OUTPUT_DIR / "articles").mkdir()
     (OUTPUT_DIR / "reviews").mkdir()
+    for g in genres:
+        if g["path"]:
+            (OUTPUT_DIR / g["path"]).mkdir(parents=True, exist_ok=True)
 
     env = Environment(
         loader=FileSystemLoader(TEMPLATES_DIR),
@@ -142,20 +150,24 @@ def build() -> None:
     ):
         shutil.copy(TEMPLATES_DIR / asset, OUTPUT_DIR / asset)
 
-    # 比較表ページ（トップ）
+    # 比較表ページ（ジャンルごとに1ページ。例: server→public/index.html, vpn→public/vpn/index.html）
     index_tpl = env.get_template("index.html")
-    (OUTPUT_DIR / "index.html").write_text(
-        index_tpl.render(
-            site_title=SITE_TITLE,
-            site_url=SITE_BASE_URL,
-            genre=config["genre"],
-            public_columns=public_columns,
-            rows=rows,
-            generated_at=generated_at,
-            root="",
-        ),
-        encoding="utf-8",
-    )
+    for g in genres:
+        genre_rows = [r for r in rows if r["genre"] == g["key"]]
+        root = "../" if g["path"] else ""
+        (OUTPUT_DIR / g["path"] / "index.html").write_text(
+            index_tpl.render(
+                site_title=SITE_TITLE,
+                site_url=SITE_BASE_URL,
+                genres=genres,
+                genre=g["label"],
+                public_columns=public_columns,
+                rows=genre_rows,
+                generated_at=generated_at,
+                root=root,
+            ),
+            encoding="utf-8",
+        )
 
     # 記事一覧ページ
     article_index_tpl = env.get_template("article_index.html")
@@ -163,6 +175,7 @@ def build() -> None:
         article_index_tpl.render(
             site_title=SITE_TITLE,
             site_url=SITE_BASE_URL,
+            genres=genres,
             articles=articles,
             root="../",
         ),
@@ -174,7 +187,11 @@ def build() -> None:
     for article in articles:
         (OUTPUT_DIR / "articles" / f"{article['slug']}.html").write_text(
             article_tpl.render(
-                site_title=SITE_TITLE, site_url=SITE_BASE_URL, article=article, root="../"
+                site_title=SITE_TITLE,
+                site_url=SITE_BASE_URL,
+                genres=genres,
+                article=article,
+                root="../",
             ),
             encoding="utf-8",
         )
@@ -186,7 +203,9 @@ def build() -> None:
         if not slug:
             continue
         (OUTPUT_DIR / "reviews" / f"{slug}.html").write_text(
-            review_tpl.render(site_title=SITE_TITLE, site_url=SITE_BASE_URL, row=row, root="../"),
+            review_tpl.render(
+                site_title=SITE_TITLE, site_url=SITE_BASE_URL, genres=genres, row=row, root="../"
+            ),
             encoding="utf-8",
         )
 
@@ -194,13 +213,16 @@ def build() -> None:
     page_tpl = env.get_template("page.html")
     for page in pages:
         (OUTPUT_DIR / f"{page['slug']}.html").write_text(
-            page_tpl.render(site_title=SITE_TITLE, site_url=SITE_BASE_URL, page=page, root=""),
+            page_tpl.render(
+                site_title=SITE_TITLE, site_url=SITE_BASE_URL, genres=genres, page=page, root=""
+            ),
             encoding="utf-8",
         )
 
     # sitemap.xml / robots.txt
     build_date = datetime.now().astimezone().strftime("%Y-%m-%d")
     paths = ["", "articles/"]
+    paths += [g["path"] for g in genres if g["path"]]
     paths += [f"articles/{a['slug']}.html" for a in articles]
     paths += [f"reviews/{r['slug']}.html" for r in rows if r.get("slug")]
     paths += [f"{p['slug']}.html" for p in pages]

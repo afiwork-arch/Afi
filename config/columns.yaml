@@ -1,5 +1,7 @@
 # スプレッドシート／JSONの列（比較項目）定義。
-# ジャンルを増やす場合は columns.yaml のコピーを作るか、genre ごとにキーを分けて拡張する。
+# 1シートに複数ジャンルの行を混在させ、各行の genre 列でどのジャンルに属するか管理する
+# （ジャンルごとに別ファイル/別シートには分けない）。generate_site.py が genres の数だけ
+# 比較ページを生成する（例: server → public/index.html, vpn → public/vpn/index.html）。
 #
 # type: manual  → 各社公式サイトを見て人が入力・更新する列
 # type: asp     → ASPクライアントが埋める列（提携リンク・ASP側の商品データなど）
@@ -8,9 +10,23 @@
 # public: true   → 比較ページの表に表示する列
 # public: false  → 内部管理用（サイトには表示しない）
 
-genre: レンタルサーバー
+# 新しいジャンルを公開する際は、下記リストにエントリを追加する前に
+# templates/index.html のhero-lead/intro/FAQ/もっと詳しく知りたい方へ
+# （現状レンタルサーバー向けの文言が直書きされている）を該当ジャンル向けに
+# 書き換えること。中身が無いまま公開すると「VPN比較ページなのにサーバーの
+# 説明文が出る」状態になってしまう。詳細はCLAUDE.mdの「ジャンル横展開」参照。
+genres:
+  - key: server
+    label: レンタルサーバー
+    path: ""
 
 columns:
+  - key: genre
+    label: "ジャンル（上記genresのkeyのいずれか。例: server / vpn）"
+    type: manual
+    required: true
+    public: false
+
   - key: service_name
     label: サービス名
     type: manual

@@ -2,19 +2,21 @@
 {% block title %}{{ row.get("service_name") }}の評判・料金・特徴を解説 | {{ site_title }}{% endblock %}
 {% block description %}{{ row.get("service_name") }}の月額料金・容量・特徴を{{ site_title }}が解説します。{{ row.get("recommend_comment") or "" }}{% endblock %}
 {% block structured_data %}
+{% set row_genre = (genres | selectattr("key", "equalto", row.get("genre")) | first) or genres[0] %}
 {% set breadcrumb_ld = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
-    {"@type": "ListItem", "position": 1, "name": "比較表", "item": site_url ~ "/index.html"},
+    {"@type": "ListItem", "position": 1, "name": row_genre.label ~ "比較", "item": site_url ~ "/" ~ row_genre.path ~ "index.html"},
     {"@type": "ListItem", "position": 2, "name": row.get("service_name")}
   ]
 } %}
 <script type="application/ld+json">{{ breadcrumb_ld | tojson }}</script>
 {% endblock %}
 {% block content %}
+{% set row_genre = (genres | selectattr("key", "equalto", row.get("genre")) | first) or genres[0] %}
 <nav class="breadcrumb">
-  <a href="{{ root }}index.html">比較表</a> &gt; {{ row.get("service_name") }}
+  <a href="{{ root }}{{ row_genre.path }}index.html">{{ row_genre.label }}比較</a> &gt; {{ row.get("service_name") }}
 </nav>
 
 <article class="review-page">
@@ -88,6 +90,6 @@
   </div>
   {% endif %}
 
-  <p class="review-back"><a href="{{ root }}index.html">← 他社と比較する(比較表に戻る)</a></p>
+  <p class="review-back"><a href="{{ root }}{{ row_genre.path }}index.html">← 他社と比較する(比較表に戻る)</a></p>
 </article>
 {% endblock %}
