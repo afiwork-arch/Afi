@@ -161,6 +161,7 @@ def build() -> None:
                 site_url=SITE_BASE_URL,
                 genres=genres,
                 genre=g["label"],
+                genre_key=g["key"],
                 public_columns=public_columns,
                 rows=genre_rows,
                 generated_at=generated_at,

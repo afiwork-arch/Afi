@@ -10,15 +10,18 @@
 # public: true   → 比較ページの表に表示する列
 # public: false  → 内部管理用（サイトには表示しない）
 
-# 新しいジャンルを公開する際は、下記リストにエントリを追加する前に
-# templates/index.html のhero-lead/intro/FAQ/もっと詳しく知りたい方へ
-# （現状レンタルサーバー向けの文言が直書きされている）を該当ジャンル向けに
-# 書き換えること。中身が無いまま公開すると「VPN比較ページなのにサーバーの
-# 説明文が出る」状態になってしまう。詳細はCLAUDE.mdの「ジャンル横展開」参照。
+# 新しいジャンルを追加する際は、templates/index.html 内の
+# {% if genre_key == "server" %}...{% else %}...{% endif %} 分岐（hero-lead/intro/
+# 診断ツール/tier-toolbar/スペック列・SSL列/FAQ/もっと詳しく知りたい方へ）に
+# そのジャンル向けの文言・要否を追記すること。分岐が無いまま genres に足すと
+# レンタルサーバー向けの文言がそのまま出てしまう。詳細はCLAUDE.mdの「ジャンル横展開」参照。
 genres:
   - key: server
     label: レンタルサーバー
     path: ""
+  - key: vpn
+    label: VPN
+    path: "vpn/"
 
 columns:
   - key: genre

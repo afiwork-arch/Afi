@@ -1,6 +1,6 @@
 # 価格チェックリスト（月次確認用）
 
-生成日時: 2026-08-26 22:15
+生成日時: 2026-08-27 06:30
 
 毎月1回、各社の「確認URL」を開き、下表の記録価格と公式サイトの表示価格を見比べてください。
 ズレていたらGoogleスプレッドシートを更新し、`python -m src.generate_site` で
@@ -18,3 +18,7 @@
 | ConoHa VPS | VPS | https://vps.conoha.jp/ | 460円 | 763円 | 1380円 | https://px.a8.net/svt/ejp?a8mat=4BAEXJ+2EBVHU+50+4Z0M6A | 512MBプラン・1ヶ月契約時の料金(更新後も同額)。長期契約でさらに割引(36ヶ月なら293円/月)。VPSのため要サーバー管理知識。転送量は要確認 (バックアップの無料/有料は要確認) |
 | カラフルボックス | 共用 | https://www.colorfulbox.jp/ | 528円 | 436円 | 733円 | https://px.a8.net/svt/ejp?a8mat=4BAEXJ+2DQFW2+42SG+62U36 | BOX1(最安)プラン、36ヶ月契約時の料金(初回割引なしの通常価格)。初期費用は3ヶ月以上契約で無料、1ヶ月契約のみ2,200円。目安PV数30,000/月。転送量は要確認 |
 | お名前.com VPS (KVM) | VPS | https://www.onamae.com/server/ | 873円 | 1209円 | 3398円 | https://px.a8.net/svt/ejp?a8mat=4BAEXJ+2CJKOI+50+35LPXU | 1GBプラン・12ヶ月払い時の実質月額を基準に採用(12/24/36ヶ月とも同額のため下限価格として妥当)。MID=2GBプラン/HIGH=4GBプラン(初期費用5,951円、支払い期間に関わらず一律)。1ヶ月払いのみの単月価格(985/1446/4065円)は他社と算出基準が揃わないため不採用。official_urlはレンタルサーバー総合ページの暫定リンク(VPS専用ページURLは要確認)。転送量・無料SSLは要確認 (バックアップの無料/有料は要確認) |
+| XServer VPS | VPS | https://vps.xserver.ne.jp/ | 1700円 | 3201円 | 3830円 | https://px.a8.net/svt/ejp?a8mat=4BAFPE+8D9CVM+CO4+25EKCY | 36ヶ月契約更新後の実質月額(公式サイトの目立つ表示価格と一致)。2GBプランは現在新規受付停止中のため掲載対象外。バックアップ有無は要確認(ビジネスプランのみ自動バックアップ○表記あり) |
+| シンVPS | VPS | https://www.shin-vps.jp/ | 325円 | 980円 | 3700円 | https://px.a8.net/svt/ejp?a8mat=4BAFPE+82JJZM+5GDG+NTJWY | 36ヶ月契約時の月額(大容量メモリプラン)。最低利用期間3ヶ月。バックアップ有無は要確認 |
+| MillenVPN | ― | https://millenvpn.jp/ | 1045円 | ― | ― | https://px.a8.net/svt/ejp?a8mat=4BAFPE+8EG836+3JTE+HV7V6 | 2年プラン初回契約時は月額396円(税込)だが更新後は950円+税/月に戻るため、実質(更新後)の金額を掲載。30日間返金保証あり。運営会社名は要確認 |
+| セカイVPN | ― | https://www.interlink.or.jp/service/sekaivpn/ | 1100円 | ― | ― | https://px.a8.net/svt/ejp?a8mat=4BAFPE+8DUSHE+7QW+1ZGG0Y | 月額料金は単一プランのみ(確認時点で契約期間による割引は無し)。最大2ヶ月間の無料体験あり(詳細条件は公式サイト要確認) |

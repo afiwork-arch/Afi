@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ genre }}比較【{{ generated_at[:7] }}更新】| {{ site_title }}{% endblock %}
 {% block structured_data %}
+{% if genre_key == "server" %}
 {% set faq_ld = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -39,19 +40,59 @@
     }
   ]
 } %}
+{% else %}
+{% set faq_ld = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "VPNは無料のものではだめなのですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "無料VPNは通信速度が遅い、ログが収集される、広告が表示されるなどのデメリットがあることが多く、安全性・快適さを重視するなら有料サービスがおすすめです。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "表示されている月額料金は、ずっとこの金額ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "契約期間によって割引が適用され、初回契約時と更新後で金額が異なるサービスがあります。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "同時に何台の端末で使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "サービスによって上限が異なります(無制限のサービスもあります)。"
+      }
+    }
+  ]
+} %}
+{% endif %}
 <script type="application/ld+json">{{ faq_ld | tojson }}</script>
 {% endblock %}
 {% block content %}
 <section class="hero">
   <h1>{{ genre }}比較 | {{ site_title }}</h1>
+  {% if genre_key == "server" %}
   <p class="hero-lead">
     {{ site_title }}は、月額料金・容量・機能をスプレッドシートで管理し、公式サイトの最新情報をもとに更新している比較サイトです。
     価格だけでなく<span class="kw">「どんな人に向いているか」</span>も比較表にまとめているので、初めての1社選びにご活用ください。
   </p>
+  {% else %}
+  <p class="hero-lead">
+    {{ site_title }}は、月額料金・特長をスプレッドシートで管理し、公式サイトの最新情報をもとに更新している比較サイトです。
+    価格だけでなく<span class="kw">「どんな人に向いているか」</span>も比較表にまとめているので、初めての1社選びにご活用ください。
+  </p>
+  {% endif %}
   <p class="updated-at">最終更新: {{ generated_at }}</p>
 </section>
 
 <section class="intro">
+  {% if genre_key == "server" %}
   <p>
     レンタルサーバーは似たようなプランが多く、価格表だけを見ても違いが分かりにくいものです。
     まずは<span class="kw">「初期費用と更新後の料金は分けて確認する」</span><span class="kw">「共用サーバーで十分か、VPSが必要か」</span>
@@ -59,13 +100,21 @@
     (詳しくは<a href="articles/how-to-choose.html">レンタルサーバーの選び方</a>、
     <a href="articles/shared-vs-vps.html">共用サーバーとVPSの違い</a>で解説しています)。
   </p>
+  {% else %}
   <p>
-    以下の比較表では、今回取り上げた{{ rows|length }}社の月額料金・容量・特長を一覧にしています。
+    VPNは似たようなサービスが多く、料金表だけを見ても違いが分かりにくいものです。
+    まずは<span class="kw">「初回割引と更新後の料金は分けて確認する」</span>という基本を押さえておくと、
+    比較表の数字の意味が理解しやすくなります。
+  </p>
+  {% endif %}
+  <p>
+    以下の比較表では、今回取り上げた{{ rows|length }}社の月額料金・特長を一覧にしています。
     各社の詳しいレビューは表の下にまとめていますので、気になるサービスがあれば
     あわせてご確認ください。
   </p>
 </section>
 
+{% if genre_key == "server" %}
 <section class="diagnosis">
   <h2>かんたん診断: あなたに合うのは?</h2>
 
@@ -137,9 +186,11 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 <section class="compare">
   <h2>{{ genre }}比較表</h2>
+  {% if genre_key == "server" %}
   <div class="tier-toolbar" id="tier-toolbar">
     <span class="sort-label">表示するプラン:</span>
     <div class="sort-group">
@@ -151,13 +202,16 @@
   <p class="tier-note">
     各社、入門プランだけでなく中位・上位プランの料金も比較できます。上位プランが無い会社は「―」と表示されます。
   </p>
+  {% endif %}
   <div class="sort-toolbar">
     <span class="sort-label">並び替え:</span>
     <div class="sort-group">
       <button type="button" class="sort-btn is-active" data-sort="default">標準</button>
       <button type="button" class="sort-btn" data-sort="price-asc">月額が安い順</button>
       <button type="button" class="sort-btn" data-sort="price-desc">月額が高い順</button>
+      {% if genre_key == "server" %}
       <button type="button" class="sort-btn" data-sort="disk-desc">容量が多い順</button>
+      {% endif %}
     </div>
   </div>
   <div class="table-wrap">
@@ -166,8 +220,10 @@
         <tr>
           <th class="col-service">サービス</th>
           <th class="col-price">月額料金</th>
+          {% if genre_key == "server" %}
           <th class="col-spec">スペック</th>
           <th class="col-ssl">無料SSL</th>
+          {% endif %}
           <th class="col-cta">公式サイト</th>
         </tr>
       </thead>
@@ -206,6 +262,7 @@
             </div>
             {% endfor %}
           </td>
+          {% if genre_key == "server" %}
           <td data-label="スペック" class="col-spec">
             {% for tier in ["low", "mid", "high"] %}
             {% set suffix = "" if tier == "low" else "_" ~ tier %}
@@ -226,6 +283,7 @@
             {% endfor %}
           </td>
           <td data-label="無料SSL" class="col-ssl">{{ row.get("free_ssl") or "-" }}</td>
+          {% endif %}
           <td data-label="公式サイト" class="col-cta">
             <a class="cta cta-small" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
                rel="nofollow sponsored" target="_blank">見る</a>
@@ -273,6 +331,7 @@
   </div>
 </section>
 
+{% if genre_key == "server" %}
 <section class="faq">
   <h2>よくある質問</h2>
   <div class="faq-item">
@@ -308,4 +367,29 @@
   </div>
   <a class="all-articles-link" href="articles/">お役立ち記事の一覧を見る →</a>
 </section>
+{% else %}
+<section class="faq">
+  <h2>よくある質問</h2>
+  <div class="faq-item">
+    <p class="faq-q">Q. VPNは無料のものではだめなのですか？</p>
+    <p class="faq-a">A. 無料VPNは通信速度が遅い、ログが収集される、広告が表示されるなどの
+      デメリットがあることが多く、安全性・快適さを重視するなら有料サービスがおすすめです。</p>
+  </div>
+  <div class="faq-item">
+    <p class="faq-q">Q. 表示されている月額料金は、ずっとこの金額ですか？</p>
+    <p class="faq-a">A. 契約期間によって割引が適用され、初回契約時と更新後で金額が異なる
+      サービスがあります。契約前に更新後の料金も確認しておくと安心です。</p>
+  </div>
+  <div class="faq-item">
+    <p class="faq-q">Q. 同時に何台の端末で使えますか？</p>
+    <p class="faq-a">A. サービスによって上限が異なります(無制限のサービスもあります)。
+      複数端末で使いたい場合は事前に確認してください。</p>
+  </div>
+</section>
+
+<section class="more-articles">
+  <h2>もっと詳しく知りたい方へ</h2>
+  <a class="all-articles-link" href="articles/">お役立ち記事の一覧を見る →</a>
+</section>
+{% endif %}
 {% endblock %}

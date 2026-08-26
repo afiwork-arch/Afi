@@ -237,13 +237,20 @@ GitHubリポジトリのSecretsに `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_
   （`path: ""` → `public/index.html`、`path: "vpn/"` → `public/vpn/index.html`）。
   ナビ（`base.html`）・sitemap・パンくずJSON-LD（`review.html`/`article.html`）はすべて
   `genres` リスト駆動なので、ジャンルを追加すればこれらは自動的に追従する。
+- **稼働中のジャンル**: `server`（レンタルサーバー/VPS、`/`）、`vpn`（VPN、`/vpn/`。2026-08-27公開）。
+  `templates/index.html` は全編 `{% if genre_key == "server" %}...{% else %}...{% endif %}` で
+  分岐している（hero-lead/intro/診断ツール(serverのみ)/tier-toolbar(serverのみ)/比較表の
+  スペック列・無料SSL列(serverのみ)/FAQ+そのJSON-LD/もっと詳しく知りたい方へ）。VPNのような
+  「容量・CPU・無料SSL・自動バックアップ」の概念が無いジャンルでは、比較表からその列自体を
+  非表示にしている（データが無いのに列だけ残して「―」を並べるより誠実という判断）。
 - **新ジャンルを追加する手順**:
-  1. `templates/index.html` のhero-lead/intro/FAQ/もっと詳しく知りたい方へ（現状レンタルサーバー
-     向けの文言が直書き）をそのジャンル向けに書き換える —— ここが唯一「genresリストに足すだけでは
-     終わらない」部分。中身が無いまま公開すると別ジャンルのページに前のジャンルの説明文が出てしまう。
+  1. `templates/index.html` の `genre_key` 分岐に、そのジャンル向けの `{% elif %}` 分岐を足す
+     （hero-lead/intro/FAQ文言、比較表に出す列が他ジャンルと違うならそこも）—— ここが唯一
+     「genresリストに足すだけでは終わらない」部分。分岐を追加せずに公開すると、既存ジャンルの
+     文言がそのまま出てしまう。
   2. `config/columns.yaml` の `genres` リストに新しいエントリを追加
   3. スプレッドシートの新規行に該当する `genre` 値を設定
-  4. そのジャンル向けの比較記事・レビューを追加
+  4. そのジャンル向けの比較記事・レビューを追加（任意）
 
 **おすすめ企業リスト（`RECOMMENDED_COMPANIES.md`）**: まだアフィリエイトリンクが無い追加候補の
 企業を一覧化したファイル。Claude Codeが調査（公式サイトURLを確認済みのもの）のうえで追記し、
@@ -263,6 +270,9 @@ GitHubリポジトリのSecretsに `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_
 - mixhostの初期費用が未確認。
 - xserver / conoha-wing / mixhost / lolipop / onamae / conoha-vps / colorfulbox の
   `transfer_capacity`（転送量）が未確認（`notes` 列に記載あり）。さくらのみ「無制限」を確認済み。
+- xserver-vps / shin-vps のバックアップ有無が未確認（xserver-vpsはビジネスプランのみ自動
+  バックアップ○表記を確認済み、それ以外のプランは未確認）。
+- millenvpnの運営会社名が未確認。
 
 ## その他
 
