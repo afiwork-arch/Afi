@@ -200,9 +200,35 @@ STEP1（サーバー種類=`server_type`）→ STEP2（予算感、`monthly_pric
   同じ形式で追加するとよい。新しい記事はトップページの`.more-articles-grid`にも1件追加リンクを
   置くと内部リンクとして機能する（`article_index.html`の一覧は`content/articles/*.md`から自動生成
   されるので手動追加不要）。
-- **今後の候補（未着手）**: Google Search Console連携（`google-site-verification`メタタグは
-  設置済みなのでプロパティ登録は容易なはず。ただしユーザー自身のログイン操作が必要なため
-  Claude Codeからは実行不可）、既存記事の加筆による情報量強化、被リンク獲得。
+- **今後の候補（未着手）**: 既存記事の加筆による情報量強化、被リンク獲得。
+
+## SEOレポートの自動生成（Search Console + Cloudflare Web Analytics）
+
+稼働中。Google Search ConsoleとCloudflare Web Analyticsは両方ともAPIで自動取得しており、
+毎月3日10:00(JST)にGitHub Actions（`.github/workflows/seo-report.yml`）が
+`python -m src.seo_report`（`src/seo_report.py`）を実行し、検索クエリ・検索流入ページ・
+ページ別アクセス数を `SEO_REPORT.md` に自動コミットする。ユーザーが手動でダッシュボードを
+確認してスクリーンショットを共有する必要はない。
+
+- **Search Console側**: 新規サービスアカウントは作らず、スプレッドシート用の既存サービスアカウント
+  （`sheetsapi@avian-outrider-506621-i4.iam.gserviceaccount.com`）を流用。Search Console側で
+  「設定 > ユーザーと権限」からこのアカウントに閲覧権限を付与済み（ユーザーの一度きりの操作、
+  Claude Codeからは実行不可）。GCP側では `searchconsole.googleapis.com` を有効化済み。
+  APIはWebmasters API（`https://www.googleapis.com/webmasters/v3/sites/{site}/searchAnalytics/query`）
+  を`google-auth`の`AuthorizedSession`で直接叩く方式（`google-api-python-client`は追加していない）。
+  scopeは`https://www.googleapis.com/auth/webmasters.readonly`。
+- **Cloudflare側**: デプロイ用の`CLOUDFLARE_API_TOKEN`とは別に、Analytics: Read権限のみを持つ
+  閲覧専用トークン（`CLOUDFLARE_ANALYTICS_TOKEN`）を新規発行して使う
+  （デプロイ用トークンを誤って触って壊すリスクを避けるため、意図的に分離）。
+  ページ別アクセス数はGraphQL Analytics APIの `rumPageloadEventsAdaptiveGroups`
+  （アカウントスコープ、`accountTag`でフィルタ。`siteTag`指定は今のところ不要だった）を使用。
+  `CLOUDFLARE_ACCOUNT_ID`はデプロイworkflowと共通の値を再利用。
+- ローカルでテストする場合は `.env` に `CLOUDFLARE_ANALYTICS_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` を
+  追加してから `python -m src.seo_report` を実行する（`.env.example`に項目あり）。
+- レポートは自動生成のみで、そこから記事を書く・企業を追加するといった判断は自動化していない
+  （意図的。価格の月次チェックと同じ「材料を揃えるところまでを自動化する」設計思想）。
+  クラウドの定期実行エージェント（`https://claude.ai/code/routines/trig_01EpJFBzMjaKRSw7BKy59FFX`）が
+  `SEO_REPORT.md`と現在のコンテンツラインナップを突き合わせて次の一手を提案する運用。
 
 ## デプロイの自動化（GitHub Actions → Cloudflare Workers）
 
