@@ -323,9 +323,14 @@ GitHubリポジトリのSecretsに `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_
 - mixhostの初期費用が未確認。
 - xserver / conoha-wing / mixhost / lolipop / onamae / conoha-vps / colorfulbox の
   `transfer_capacity`（転送量）が未確認（`notes` 列に記載あり）。さくらのみ「無制限」を確認済み。
-- xserver-vps / shin-vps のバックアップ有無が未確認（xserver-vpsはビジネスプランのみ自動
-  バックアップ○表記を確認済み、それ以外のプランは未確認）。
+- xserver-vps / shin-vps / sakura-vps / sakura-vps-windows / kagoya-vps の転送量・
+  バックアップ有無が未確認（xserver-vpsはビジネスプランのみ自動バックアップ○表記を確認済み、
+  それ以外のプランは未確認）。
 - millenvpnの運営会社名が未確認。
+- **xserver-vpsのビジネスプラン(HIGH帯)はA8.net通知(2026-08-29受信)により2026年8月31日〜
+  9月中旬頃まで新規受付停止中のため一時非掲載**（`monthly_price_high`等を空欄化、
+  `detail_review`からも言及を削除済み）。復元用の元の値は該当行の`notes`列に記載してある。
+  再開時期が来たら公式サイトで受付再開を確認し、掲載を復元すること。
 
 ## その他
 

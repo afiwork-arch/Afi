@@ -20,12 +20,10 @@ Claude Codeが記事追加・データ拡充・ジャンル横展開などの作
 （ConoHa WING/ConoHa VPS、お名前.com レンタルサーバー/VPSと同じ「姉妹商品を2行に分けて掲載する」
 パターンで追加できます）
 
-| 会社名 | 公式サイト | 備考 |
-|---|---|---|
-| さくらのVPS | https://vps.sakura.ad.jp/ | 掲載中の「さくらのレンタルサーバ」の姉妹VPS商品 |
-| KAGOYA CLOUD VPS | https://www.kagoya.jp/vps/ | カゴヤ・ジャパン運営の老舗国産VPS。全プランNVMe SSD |
+現時点で未申請の追加候補はありません。
 
-（Xserver VPS・シンVPSは2026-08-27にアフィリエイトリンクを取得し掲載済みのためリストから削除）
+（Xserver VPS・シンVPSは2026-08-27に、さくらのVPS・さくらのVPS for Windows Server・
+KAGOYA CLOUD VPSは2026-08-29にアフィリエイトリンクを取得し掲載済みのためリストから削除）
 
 ## VPN
 
