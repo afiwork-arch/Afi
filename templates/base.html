@@ -27,10 +27,10 @@
 <body>
   <header class="site-header">
     <div class="site-header-inner">
-      <a class="site-title" href="{{ root }}index.html">{{ site_title }}</a>
+      <a class="site-title" href="{{ root or '/' }}">{{ site_title }}</a>
       <nav>
         {% for g in genres %}
-        <a href="{{ root }}{{ g.path }}index.html">{{ g.label }}比較</a>
+        <a href="{{ (root ~ g.path) or '/' }}">{{ g.label }}比較</a>
         {% endfor %}
         <a href="{{ root }}articles/">お役立ち記事</a>
       </nav>
@@ -39,7 +39,7 @@
 
   <div class="pr-bar">
     <span class="pr-badge">PR</span>
-    本サイトはアフィリエイト広告(プロモーション)を含みます。詳しくは<a href="{{ root }}disclaimer.html">免責事項</a>をご覧ください。
+    本サイトはアフィリエイト広告(プロモーション)を含みます。詳しくは<a href="{{ root }}disclaimer">免責事項</a>をご覧ください。
   </div>
 
   <main>
@@ -50,10 +50,10 @@
     <div class="site-footer-inner">
       <p>本サイトはアフィリエイトプログラムにより収益を得ています。掲載の料金・仕様は変更される場合があるため、必ず公式サイトで最新情報をご確認ください。</p>
       <nav class="footer-nav">
-        <a href="{{ root }}about.html">運営者情報</a>
-        <a href="{{ root }}privacy.html">プライバシーポリシー</a>
-        <a href="{{ root }}disclaimer.html">免責事項</a>
-        <a href="{{ root }}contact.html">お問い合わせ</a>
+        <a href="{{ root }}about">運営者情報</a>
+        <a href="{{ root }}privacy">プライバシーポリシー</a>
+        <a href="{{ root }}disclaimer">免責事項</a>
+        <a href="{{ root }}contact">お問い合わせ</a>
       </nav>
       <p class="copyright">&copy; {{ site_title }}</p>
     </div>

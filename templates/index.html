@@ -97,8 +97,8 @@
     レンタルサーバーは似たようなプランが多く、価格表だけを見ても違いが分かりにくいものです。
     まずは<span class="kw">「初期費用と更新後の料金は分けて確認する」</span><span class="kw">「共用サーバーで十分か、VPSが必要か」</span>
     といった基本を押さえておくと、比較表の数字の意味が理解しやすくなります
-    (詳しくは<a href="articles/how-to-choose.html">レンタルサーバーの選び方</a>、
-    <a href="articles/shared-vs-vps.html">共用サーバーとVPSの違い</a>で解説しています)。
+    (詳しくは<a href="articles/how-to-choose">レンタルサーバーの選び方</a>、
+    <a href="articles/shared-vs-vps">共用サーバーとVPSの違い</a>で解説しています)。
   </p>
   {% else %}
   <p>
@@ -178,7 +178,7 @@
         {% endif %}
         <a class="cta" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
            rel="nofollow sponsored" target="_blank">{{ row.get("service_name") }}を見る</a>
-        <a class="review-more-link" href="reviews/{{ row.get('slug') }}.html">詳細レビューを見る →</a>
+        <a class="review-more-link" href="reviews/{{ row.get('slug') }}">詳細レビューを見る →</a>
       </div>
       {% endif %}
       {% endfor %}
@@ -325,7 +325,7 @@
       <p>{{ row.get("detail_review") }}</p>
       <a class="cta cta-small" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
          rel="nofollow sponsored" target="_blank">{{ row.get("service_name") }}の公式サイトを見る</a>
-      <a class="review-more-link" href="reviews/{{ row.get('slug') }}.html">{{ row.get("service_name") }}の詳細レビューを見る →</a>
+      <a class="review-more-link" href="{{ root }}reviews/{{ row.get('slug') }}">{{ row.get("service_name") }}の詳細レビューを見る →</a>
     </article>
     {% endfor %}
   </div>
@@ -337,33 +337,33 @@
   <div class="faq-item">
     <p class="faq-q">Q. レンタルサーバーとドメインは別々に契約する必要がありますか？</p>
     <p class="faq-a">A. 別々でも契約できますが、初めての方は同じ会社でまとめて契約すると管理が簡単です。
-      詳しくは<span class="kw">「<a href="articles/how-to-start-wordpress.html">WordPressブログの始め方</a>」</span>で解説しています。</p>
+      詳しくは<span class="kw">「<a href="articles/how-to-start-wordpress">WordPressブログの始め方</a>」</span>で解説しています。</p>
   </div>
   <div class="faq-item">
     <p class="faq-q">Q. 共用サーバーとVPSはどちらを選べばいいですか？</p>
     <p class="faq-a">A. 初めての方は共用サーバーで十分なケースがほとんどです。違いは
-      <span class="kw">「<a href="articles/shared-vs-vps.html">共用サーバーとVPSの違い</a>」</span>で解説しています。</p>
+      <span class="kw">「<a href="articles/shared-vs-vps">共用サーバーとVPSの違い</a>」</span>で解説しています。</p>
   </div>
   <div class="faq-item">
     <p class="faq-q">Q. 表示されている月額料金は、ずっとこの金額ですか？</p>
     <p class="faq-a">A. 多くの場合、初回契約時の割引価格です。更新後の料金については
-      <span class="kw">「<a href="articles/hidden-costs.html">見落としがちな更新料金の注意点</a>」</span>で解説しています。</p>
+      <span class="kw">「<a href="articles/hidden-costs">見落としがちな更新料金の注意点</a>」</span>で解説しています。</p>
   </div>
   <div class="faq-item">
     <p class="faq-q">Q. 今使っているサーバーから乗り換えることはできますか？</p>
     <p class="faq-a">A. 多くの会社が移転サポートを用意しています。詳しくは
-      <span class="kw">「<a href="articles/server-migration.html">サーバーの乗り換えは難しい？</a>」</span>をご覧ください。</p>
+      <span class="kw">「<a href="articles/server-migration">サーバーの乗り換えは難しい？</a>」</span>をご覧ください。</p>
   </div>
 </section>
 
 <section class="more-articles">
   <h2>もっと詳しく知りたい方へ</h2>
   <div class="more-articles-grid">
-    <a href="articles/xserver-vs-conoha-wing.html">エックスサーバーとConoHa WINGを比較</a>
-    <a href="articles/lolipop-vs-sakura.html">ロリポップとさくらのレンタルサーバを比較</a>
-    <a href="articles/site-speed.html">サイトの表示速度はサーバーで変わる？</a>
-    <a href="articles/security-checklist.html">セキュリティ機能で確認すべき5つのポイント</a>
-    <a href="articles/free-trial.html">無料お試し期間・返金保証は使うべき？</a>
+    <a href="articles/xserver-vs-conoha-wing">エックスサーバーとConoHa WINGを比較</a>
+    <a href="articles/lolipop-vs-sakura">ロリポップとさくらのレンタルサーバを比較</a>
+    <a href="articles/site-speed">サイトの表示速度はサーバーで変わる？</a>
+    <a href="articles/security-checklist">セキュリティ機能で確認すべき5つのポイント</a>
+    <a href="articles/free-trial">無料お試し期間・返金保証は使うべき？</a>
   </div>
   <a class="all-articles-link" href="articles/">お役立ち記事の一覧を見る →</a>
 </section>
