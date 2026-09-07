@@ -30,6 +30,55 @@ OUTPUT_DIR = ROOT / "public"
 SITE_TITLE = "サバナビ"  # サイトのブランド名
 SITE_BASE_URL = "https://sabanavi-hikaku.com"  # 独自ドメイン（末尾スラッシュなし）
 
+# 記事本文(content/articles/*.md)内で {{alias:slug}} / {{alias:slug:mid}} / {{alias:slug:high}}
+# と書くと、data/services.json の該当行から値を差し込む。手打ちの数字はスプレッドシートの
+# 更新時にズレる(ミス・更新漏れ)ため、料金・スペックなど「シートの値そのもの」を記事に書きたい
+# 箇所は必ずこの記法を使うこと。存在しないslug/フィールドを参照した場合はビルドを失敗させる
+# (サイレントに空欄・古い値のままにしない)。詳細はCLAUDE.md参照。
+PLACEHOLDER_RE = re.compile(r"\{\{(\w+):([a-z0-9_-]+)(?::(mid|high))?\}\}")
+PLACEHOLDER_ALIASES = {
+    "price": "monthly_price",
+    "setup_fee": "setup_fee",
+    "disk": "disk_capacity",
+    "cpu_memory": "cpu_memory",
+    "plan_name": "plan_name",
+    "company": "company",
+    "service_name": "service_name",
+    "storage_type": "storage_type",
+    "backup": "backup",
+    "free_ssl": "free_ssl",
+    "transfer_capacity": "transfer_capacity",
+    "server_type": "server_type",
+    "official_url": "official_url",
+}
+_YEN_FIELDS = {"monthly_price", "setup_fee"}
+
+
+def resolve_placeholders(text: str, rows_by_slug: dict, source: str) -> str:
+    def replace(m: re.Match) -> str:
+        alias, slug, tier = m.group(1), m.group(2), m.group(3)
+        base_field = PLACEHOLDER_ALIASES.get(alias)
+        if base_field is None:
+            raise ValueError(
+                f"{source}: 未知の変数種別 '{alias}' です({m.group(0)})。"
+                f"使えるのは {', '.join(sorted(PLACEHOLDER_ALIASES))} のいずれか。"
+            )
+        field = f"{base_field}_{tier}" if tier else base_field
+        row = rows_by_slug.get(slug)
+        if row is None:
+            raise ValueError(f"{source}: slug '{slug}' が見つかりません({m.group(0)})。")
+        value = row.get(field)
+        if value is None or value == "":
+            raise ValueError(
+                f"{source}: '{slug}' の '{field}' が空です({m.group(0)})。"
+                "このプラン帯が存在しない会社の可能性があるので、記事側の参照を見直してください。"
+            )
+        if base_field in _YEN_FIELDS and isinstance(value, (int, float)):
+            return f"{int(value):,}"
+        return str(value)
+
+    return PLACEHOLDER_RE.sub(replace, text)
+
 
 def load_columns() -> dict:
     with COLUMNS_PATH.open(encoding="utf-8") as f:
@@ -45,14 +94,15 @@ def load_rows() -> list[dict]:
         return json.load(f)
 
 
-def load_articles(default_genre: str) -> list[dict]:
+def load_articles(default_genre: str, rows_by_slug: dict) -> list[dict]:
     articles = []
     if not CONTENT_DIR.exists():
         return articles
 
     for md_path in sorted(CONTENT_DIR.glob("*.md")):
         post = frontmatter.load(md_path)
-        html_content = markdown.markdown(post.content, extensions=["extra"])
+        content = resolve_placeholders(post.content, rows_by_slug, source=md_path.name)
+        html_content = markdown.markdown(content, extensions=["extra"])
         articles.append(
             {
                 "title": post.get("title", md_path.stem),
@@ -108,7 +158,8 @@ def build() -> None:
     default_genre = genres[0]["key"]
 
     rows = load_rows()
-    articles = load_articles(default_genre)
+    rows_by_slug = {row["slug"]: row for row in rows if row.get("slug")}
+    articles = load_articles(default_genre, rows_by_slug)
     pages = load_pages()
     public_columns = [c for c in config["columns"] if c.get("public")]
 

@@ -13,9 +13,9 @@ slug: xserver-vs-conoha-wing
 
 | プラン帯 | エックスサーバー | ConoHa WING |
 |---|---|---|
-| 入門プラン | 693円〜 | 970円〜 |
-| 中位プラン | 1,980円(プレミアム) | 1,925円(スタンダード) |
-| 上位プラン | 3,762円(ビジネス) | 3,850円(プレミアム) |
+| 入門プラン | {{price:xserver}}円〜 | {{price:conoha-wing}}円〜 |
+| 中位プラン | {{price:xserver:mid}}円({{plan_name:xserver:mid}}) | {{price:conoha-wing:mid}}円({{plan_name:conoha-wing:mid}}) |
+| 上位プラン | {{price:xserver:high}}円({{plan_name:xserver:high}}) | {{price:conoha-wing:high}}円({{plan_name:conoha-wing:high}}) |
 
 入門プランはエックスサーバーの方が安く、中位・上位プランはほぼ横並びです。
 どちらも初期費用は無料で、期間限定の割引キャンペーンが行われることがあるため、
@@ -25,10 +25,10 @@ slug: xserver-vs-conoha-wing
 
 | 比較項目 | エックスサーバー | ConoHa WING |
 |---|---|---|
-| ディスク容量(入門) | 500GB | 500GB |
-| ストレージ | NVMe SSD | SSD |
-| 無料独自SSL | あり | あり |
-| 自動バックアップ | 無料標準 | 無料標準 |
+| ディスク容量(入門) | {{disk:xserver}} | {{disk:conoha-wing}} |
+| ストレージ | {{storage_type:xserver}} | {{storage_type:conoha-wing}} |
+| 無料独自SSL | {{free_ssl:xserver}} | {{free_ssl:conoha-wing}} |
+| 自動バックアップ | {{backup:xserver}} | {{backup:conoha-wing}} |
 | サービス開始 | 2003年〜(老舗) | GMOインターネットグループ運営 |
 
 基本スペックは両社ともほぼ横並びで、「容量が足りない」「SSLが有料」といった不満が出にくい
@@ -39,13 +39,13 @@ slug: xserver-vs-conoha-wing
 
 **エックスサーバー**は2003年のサービス開始から20年以上の運営実績があり、稼働率99.99%以上を
 公表しています。法人サイトから個人ブログまで採用実績が幅広く、「とにかく実績と安定性で選びたい」
-という方に向いています。詳しくは[エックスサーバーのレビュー](../reviews/xserver.html)でも
+という方に向いています。詳しくは[エックスサーバーのレビュー](../reviews/xserver)でも
 まとめています。
 
 **ConoHa WING**はGMOインターネットグループが提供しており、国内最速クラスを謳う表示速度と、
 視覚的で分かりやすい管理画面が特長です。「WINGパック」という初期費用無料・独自ドメイン特典
 込みの料金プランが用意されており、初めてWordPressを触る方からの評判も良好です。詳しくは
-[ConoHa WINGのレビュー](../reviews/conoha-wing.html)でもまとめています。
+[ConoHa WINGのレビュー](../reviews/conoha-wing)でもまとめています。
 
 ## どちらを選ぶべきか
 
@@ -57,5 +57,5 @@ slug: xserver-vs-conoha-wing
 
 ---
 
-料金・容量は[比較表](../index.html)でも一覧比較できます。サーバー選びで迷ったら
-[レンタルサーバーの選び方](how-to-choose.html)もあわせてご覧ください。
+料金・容量は[比較表](../index)でも一覧比較できます。サーバー選びで迷ったら
+[レンタルサーバーの選び方](how-to-choose)もあわせてご覧ください。

@@ -25,9 +25,9 @@ slug: sakura-review
 
 | プラン | 月額料金(税込) | ディスク容量 | 転送量 | 無料独自SSL | 自動バックアップ | 初期費用 |
 |---|---|---|---|---|---|---|
-| ライトプラン(単独) | 121円〜 | 100GB | 無制限 | あり | 無料標準 | 無料 |
-| スタンダードプラン(中位) | 500円〜 | ― | 無制限 | あり | 無料標準 | 無料 |
-| ビジネスプラン(上位) | 1,980円〜 | ― | 無制限 | あり | 無料標準 | 無料 |
+| ライトプラン(単独) | {{price:sakura}}円〜 | {{disk:sakura}} | {{transfer_capacity:sakura}} | {{free_ssl:sakura}} | {{backup:sakura}} | 無料 |
+| スタンダードプラン(中位) | {{price:sakura:mid}}円〜 | {{disk:sakura:mid}} | {{transfer_capacity:sakura}} | {{free_ssl:sakura}} | {{backup:sakura}} | 無料 |
+| ビジネスプラン(上位) | {{price:sakura:high}}円〜 | {{disk:sakura:high}} | {{transfer_capacity:sakura}} | {{free_ssl:sakura}} | {{backup:sakura}} | 無料 |
 
 ※料金は契約期間によって変動します。上記は目安のため、申込前に必ず
 [さくらのレンタルサーバ公式サイト](https://www.sakura.ne.jp/)で最新の金額をご確認ください。
