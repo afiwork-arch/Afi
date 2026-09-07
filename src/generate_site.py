@@ -166,6 +166,7 @@ def build() -> None:
                 rows=genre_rows,
                 generated_at=generated_at,
                 root=root,
+                canonical_url=f"{SITE_BASE_URL}/{g['path']}",
             ),
             encoding="utf-8",
         )
@@ -179,6 +180,7 @@ def build() -> None:
             genres=genres,
             articles=articles,
             root="../",
+            canonical_url=f"{SITE_BASE_URL}/articles/",
         ),
         encoding="utf-8",
     )
@@ -193,6 +195,7 @@ def build() -> None:
                 genres=genres,
                 article=article,
                 root="../",
+                canonical_url=f"{SITE_BASE_URL}/articles/{article['slug']}",
             ),
             encoding="utf-8",
         )
@@ -205,7 +208,12 @@ def build() -> None:
             continue
         (OUTPUT_DIR / "reviews" / f"{slug}.html").write_text(
             review_tpl.render(
-                site_title=SITE_TITLE, site_url=SITE_BASE_URL, genres=genres, row=row, root="../"
+                site_title=SITE_TITLE,
+                site_url=SITE_BASE_URL,
+                genres=genres,
+                row=row,
+                root="../",
+                canonical_url=f"{SITE_BASE_URL}/reviews/{slug}",
             ),
             encoding="utf-8",
         )
@@ -215,7 +223,12 @@ def build() -> None:
     for page in pages:
         (OUTPUT_DIR / f"{page['slug']}.html").write_text(
             page_tpl.render(
-                site_title=SITE_TITLE, site_url=SITE_BASE_URL, genres=genres, page=page, root=""
+                site_title=SITE_TITLE,
+                site_url=SITE_BASE_URL,
+                genres=genres,
+                page=page,
+                root="",
+                canonical_url=f"{SITE_BASE_URL}/{page['slug']}",
             ),
             encoding="utf-8",
         )
@@ -224,9 +237,9 @@ def build() -> None:
     build_date = datetime.now().astimezone().strftime("%Y-%m-%d")
     paths = ["", "articles/"]
     paths += [g["path"] for g in genres if g["path"]]
-    paths += [f"articles/{a['slug']}.html" for a in articles]
-    paths += [f"reviews/{r['slug']}.html" for r in rows if r.get("slug")]
-    paths += [f"{p['slug']}.html" for p in pages]
+    paths += [f"articles/{a['slug']}" for a in articles]
+    paths += [f"reviews/{r['slug']}" for r in rows if r.get("slug")]
+    paths += [f"{p['slug']}" for p in pages]
 
     sitemap_entries = "\n".join(
         f"  <url><loc>{SITE_BASE_URL}/{p}</loc><lastmod>{build_date}</lastmod></url>"
