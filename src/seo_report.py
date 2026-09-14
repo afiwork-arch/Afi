@@ -45,26 +45,26 @@ def fetch_search_console_rows(dimension: str, start: str, end: str, row_limit: i
     return resp.json().get("rows", [])
 
 
-def fetch_cloudflare_pageviews(start: str, end: str, limit: int = 20) -> list[dict]:
+def _run_cloudflare_rum_query(dimension_fields: str, start: str, end: str, limit: int) -> list[dict]:
     token = os.environ["CLOUDFLARE_ANALYTICS_TOKEN"]
     account_id = os.environ["CLOUDFLARE_ACCOUNT_ID"]
-    query = """
-    query ($accountTag: String!, $start: Time!, $end: Time!, $limit: Int!) {
-      viewer {
-        accounts(filter: {accountTag: $accountTag}) {
+    query = f"""
+    query ($accountTag: String!, $start: Time!, $end: Time!, $limit: Int!) {{
+      viewer {{
+        accounts(filter: {{accountTag: $accountTag}}) {{
           rumPageloadEventsAdaptiveGroups(
             limit: $limit
             orderBy: [count_DESC]
-            filter: {datetime_geq: $start, datetime_leq: $end}
-          ) {
+            filter: {{datetime_geq: $start, datetime_leq: $end}}
+          ) {{
             count
-            dimensions {
-              requestPath
-            }
-          }
-        }
-      }
-    }
+            dimensions {{
+              {dimension_fields}
+            }}
+          }}
+        }}
+      }}
+    }}
     """
     resp = requests.post(
         "https://api.cloudflare.com/client/v4/graphql",
@@ -82,6 +82,18 @@ def fetch_cloudflare_pageviews(start: str, end: str, limit: int = 20) -> list[di
     return accounts[0]["rumPageloadEventsAdaptiveGroups"] if accounts else []
 
 
+def fetch_cloudflare_pageviews(start: str, end: str, limit: int = 20) -> list[dict]:
+    return _run_cloudflare_rum_query("requestPath", start, end, limit)
+
+
+def fetch_cloudflare_referrers(start: str, end: str, limit: int = 20) -> list[dict]:
+    """参照元ホスト別のページビュー数。note等の外部送客チャネルが実際にクリックを
+    生んでいるか確認するためのもの。Cloudflare Web AnalyticsのRUMはURLのクエリ文字列
+    (?utm_source=... 等)を持たないため、UTMパラメータでの計測はできない
+    ——参照元はHTTPリファラのホスト名でしか判別できない点に注意。"""
+    return _run_cloudflare_rum_query("refererHost", start, end, limit)
+
+
 def build() -> None:
     load_dotenv(dotenv_path=ROOT / ".env")
 
@@ -95,6 +107,7 @@ def build() -> None:
     cf_start = f"{start_str}T00:00:00Z"
     cf_end = f"{end_str}T23:59:59Z"
     pageviews = fetch_cloudflare_pageviews(cf_start, cf_end, limit=20)
+    referrers = fetch_cloudflare_referrers(cf_start, cf_end, limit=20)
 
     generated_at = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M")
     lines = [
@@ -135,6 +148,25 @@ def build() -> None:
         lines += ["| パス | ページビュー数 |", "|---|---|"]
         for row in pageviews:
             lines.append(f"| {row['dimensions']['requestPath']} | {row['count']} |")
+    else:
+        lines.append("(まだデータがありません)")
+
+    lines += [
+        "",
+        "## 参照元別アクセス数(Cloudflare Web Analytics)",
+        "",
+        "note等の外部送客が実際にクリックを生んでいるかの確認用。**注意**: Cloudflare Web "
+        "AnalyticsのRUMはURLのクエリ文字列を保持しないため、noteの下書きに付けている "
+        "`?utm_source=note...` はここでは判別できない（参照元はHTTPリファラのホスト名でのみ"
+        "判別可能）。また外部サイトが `rel=\"noreferrer\"` を付けているとリファラ自体が届かず"
+        "「(参照元不明/直接アクセス)」に混ざる点にも留意（0件=クリックが無いと断定はできない）。",
+        "",
+    ]
+    if referrers:
+        lines += ["| 参照元 | ページビュー数 |", "|---|---|"]
+        for row in referrers:
+            host = row["dimensions"]["refererHost"] or "(参照元不明/直接アクセス)"
+            lines.append(f"| {host} | {row['count']} |")
     else:
         lines.append("(まだデータがありません)")
 
