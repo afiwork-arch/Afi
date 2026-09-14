@@ -95,6 +95,11 @@ GitHub Actionsのデプロイワークフローもこのコマンドを使って
 する前に **`{{種別:slug}}` / `{{種別:slug:mid}}` / `{{種別:slug:high}}`** というプレースホルダーを
 `data/services.json`の該当行の値に置換する仕組みを用意してある（`resolve_placeholders()`）。
 
+**2026-09-15時点でこの仕組みはスプレッドシートの`detail_review`/`recommend_comment`列にも適用**
+している（`build()`内でrow単位に`resolve_placeholders()`を通す）。つまり各社レビュー文（Google
+スプレッドシート側で編集する文章）の中で価格に触れたい場合も、`月額330円〜`のように直接タイプ
+せず`月額{{price:lolipop}}円〜`と書けば、シートの`monthly_price`更新時に自動で追従する。
+
 - 使える`種別`: `price`(→`monthly_price`), `setup_fee`, `disk`(→`disk_capacity`), `cpu_memory`,
   `plan_name`, `company`, `service_name`, `storage_type`, `backup`, `free_ssl`,
   `transfer_capacity`, `server_type`, `official_url`
@@ -230,7 +235,23 @@ STEP1（サーバー種類=`server_type`）→ STEP2（予算感、`monthly_pric
   同じ形式で追加するとよい。新しい記事はトップページの`.more-articles-grid`にも1件追加リンクを
   置くと内部リンクとして機能する（`article_index.html`の一覧は`content/articles/*.md`から自動生成
   されるので手動追加不要）。
-- **今後の候補（未着手）**: 既存記事の加筆による情報量強化、被リンク獲得。
+- **各社レビュー（`detail_review`）の深堀り（2026-09-15開始）**: サイトが3週間前後と新しく
+  アクセスがほぼ無い状況について、一般的なSEOの目安（新規ドメインは3〜6ヶ月の「サンドボックス」
+  期間が普通）に照らせば想定内という調査結果をユーザーと共有した上で、ユーザーから「各社レビューを
+  伸ばす」「詳しい人でも知らない知識を入れる」方針の指示を受けて着手。各社の公式サイトをWebFetchで
+  深掘りし、単なる言い換えでなく独自の技術仕様（サーバーソフトウェア、PHP対応バージョン、SSH/Git/
+  WP-CLI対応、コントロールパネルの種類、データセンター所在地、サポート体制の詳細、最新のアップデート
+  情報など）を追加する形で`detail_review`を400〜600字程度に拡充する運用。Agent（`general-purpose`）
+  を1社1エージェントで並列起動し、WebFetch優先・不可の場合はWebSearchで代替、確認できない情報は
+  書かない（創作禁止）という条件で調査・ドラフトさせ、内容を確認してからスプレッドシートに反映する
+  進め方が機能した。2026-09-15時点で xserver / sakura / lolipop / conoha-wing / mixhost / onamae /
+  sekai-vpn の7社が完了（Search Consoleで表示回数がある会社を優先）。残り13社
+  （conoha-vps, colorfulbox, onamae-vps, xserver-vps, shin-vps, millenvpn, sakura-vps,
+  sakura-vps-windows, kagoya-vps, starserver, heteml, glocal-vpn-fixed-ip, glocal-vpn-movie）は
+  同じ要領で継続予定。価格に触れる場合は直接ベタ書きせず`{{price:slug}}`プレースホルダーを使うこと
+  （上記「記事内の料金・スペック表記は変数（プレースホルダー）で埋める」参照、2026-09-15時点で
+  `detail_review`もプレースホルダー解決の対象）。
+- **今後の候補（未着手）**: 被リンク獲得。
 
 ## 外部プラットフォーム（note/Zenn）での拡散（2026-08-27調査、2026-09-01時点で投稿済み）
 

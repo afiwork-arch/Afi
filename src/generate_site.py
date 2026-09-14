@@ -165,6 +165,12 @@ def build() -> None:
 
     for row in rows:
         row["genre"] = row.get("genre") or default_genre
+        for field in ("detail_review", "recommend_comment"):
+            value = row.get(field)
+            if value:
+                row[field] = resolve_placeholders(
+                    value, rows_by_slug, source=f"{row.get('slug')}.{field}"
+                )
         for tier_suffix in ("", "_mid", "_high"):
             price = row.get(f"monthly_price{tier_suffix}")
             row[f"_price_sort{tier_suffix}"] = (
