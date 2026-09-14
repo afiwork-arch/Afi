@@ -6,6 +6,9 @@
   <title>{% block title %}{{ site_title }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ site_title }}は、レンタルサーバー各社の料金・容量・機能を比較できるサイトです。公式サイトの最新情報をもとに更新しています。{% endblock %}">
   <meta name="google-site-verification" content="o7Zcfegm3i3a5B-HjU4RobohQUi8L4fvSlwDsaI-3PA" />
+  {% if canonical_url %}
+  <link rel="canonical" href="{{ canonical_url }}">
+  {% endif %}
   <link rel="icon" href="{{ root }}favicon.svg" type="image/svg+xml">
   <link rel="icon" href="{{ root }}favicon.ico" sizes="any">
   <link rel="icon" href="{{ root }}favicon-32x32.png" type="image/png" sizes="32x32">
