@@ -5,9 +5,10 @@
 <section class="hero">
   <h1>{{ site_title }}</h1>
   <p class="hero-lead">
-    月額料金・容量・特長をスプレッドシートで管理し、公式サイトの最新情報をもとに更新している
-    比較サイトです。価格だけでなく<span class="kw">「どんな人に向いているか」</span>もまとめて
-    いるので、気になるジャンルを選んで、あなたに合う1社を見つけてください。
+    レンタルサーバー・VPNなど、IT系サービスの月額料金や特長を比較できるサイトです。
+    掲載内容は公式サイトの最新情報をもとに更新しています。価格だけでなく
+    <span class="kw">「どんな人に向いているか」</span>もまとめているので、気になるジャンルを
+    選んで、あなたに合う1社を見つけてください。
   </p>
 </section>
 
@@ -15,10 +16,7 @@
   <h2>ジャンルから探す</h2>
   <div class="genre-cards">
     {% for g in genres %}
-    <a class="genre-card" href="{{ root }}{{ g.path }}">
-      <span class="genre-card-icon" aria-hidden="true">
-        {% if g.key == "server" %}🖥{% elif g.key == "vpn" %}🔒{% else %}📦{% endif %}
-      </span>
+    <a class="genre-card genre-{{ g.key }}" href="{{ root }}{{ g.path }}">
       <span class="genre-card-body">
         <span class="genre-card-title">{{ g.label }}比較</span>
         <span class="genre-card-desc">{{ genre_counts.get(g.key, 0) }}社の料金・特長を比較</span>

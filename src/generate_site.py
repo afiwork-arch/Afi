@@ -94,6 +94,13 @@ def load_rows() -> list[dict]:
         return json.load(f)
 
 
+def wrap_tables_for_scroll(html_content: str) -> str:
+    """Markdown由来の<table>をスクロール可能なラッパーで囲み、スマホ幅でもはみ出さないようにする。"""
+    html_content = html_content.replace("<table>", '<div class="table-scroll"><table>')
+    html_content = html_content.replace("</table>", "</table></div>")
+    return html_content
+
+
 def load_articles(default_genre: str, rows_by_slug: dict) -> list[dict]:
     articles = []
     if not CONTENT_DIR.exists():
@@ -102,7 +109,7 @@ def load_articles(default_genre: str, rows_by_slug: dict) -> list[dict]:
     for md_path in sorted(CONTENT_DIR.glob("*.md")):
         post = frontmatter.load(md_path)
         content = resolve_placeholders(post.content, rows_by_slug, source=md_path.name)
-        html_content = markdown.markdown(content, extensions=["extra"])
+        html_content = wrap_tables_for_scroll(markdown.markdown(content, extensions=["extra"]))
         articles.append(
             {
                 "title": post.get("title", md_path.stem),
@@ -140,7 +147,7 @@ def load_pages() -> list[dict]:
 
     for md_path in sorted(PAGES_DIR.glob("*.md")):
         post = frontmatter.load(md_path)
-        html_content = markdown.markdown(post.content, extensions=["extra"])
+        html_content = wrap_tables_for_scroll(markdown.markdown(post.content, extensions=["extra"]))
         pages.append(
             {
                 "title": post.get("title", md_path.stem),
