@@ -3,40 +3,68 @@
 {% block description %}{{ site_title }}は、{{ genres | map(attribute="label") | join("・") }}など複数ジャンルのサービスを料金・特長で比較できるサイトです。公式サイトの最新情報をもとに更新しています。{% endblock %}
 {% block content %}
 <section class="hero">
-  <h1>{{ site_title }}</h1>
+  <p class="tile-eyebrow">{{ genres | map(attribute="label") | join("・") }} 比較盤</p>
+  <h1 class="hero-headline"><span>比較は、</span><span>計器のように</span><span>読める方がいい。</span></h1>
   <p class="hero-lead">
-    レンタルサーバー・VPNなど、IT系サービスの月額料金や特長を比較できるサイトです。
-    掲載内容は公式サイトの最新情報をもとに更新しています。価格だけでなく
-    <span class="kw">「どんな人に向いているか」</span>もまとめているので、気になるジャンルを
-    選んで、あなたに合う1社を見つけてください。
+    料金・容量・特長といった数字を、一覧で読める形に整理しました。
+    <span class="kw">「どんな人に向いているか」</span>もあわせてまとめているので、
+    気になるジャンルを選んで、あなたに合う1社を見つけてください。
+  </p>
+  <p class="status-strip">
+    <span class="status-dot" aria-hidden="true"></span>
+    <span class="mono"><strong>{{ total_count }}</strong>社 掲載中</span>
+    <span class="sep">/</span>
+    <span class="mono">最終更新 <strong>{{ generated_at }}</strong></span>
   </p>
 </section>
 
-<section class="genre-cards-section">
-  <h2>ジャンルから探す</h2>
-  <div class="genre-cards">
-    {% for g in genres %}
-    <a class="genre-card genre-{{ g.key }}" href="{{ root }}{{ g.path }}">
-      <span class="genre-card-body">
-        <span class="genre-card-title">{{ g.label }}比較</span>
-        <span class="genre-card-desc">{{ genre_counts.get(g.key, 0) }}社の料金・特長を比較</span>
-      </span>
-      <span class="genre-card-arrow" aria-hidden="true">→</span>
-    </a>
-    {% endfor %}
+<div class="bento">
+  {% for g in genres %}
+  <a class="tile tile-genre genre-{{ g.key }}" href="{{ root }}{{ g.path }}">
+    <div>
+      <p class="tile-eyebrow">{{ g.label }}</p>
+      <p class="count">{{ genre_counts.get(g.key, 0) }}<small>社</small></p>
+      {% if genre_samples.get(g.key) %}
+      <p class="names">{{ genre_samples.get(g.key) | join(" / ") }}{% if genre_counts.get(g.key, 0) > genre_samples.get(g.key) | length %} ほか{% endif %}</p>
+      {% endif %}
+    </div>
+    <span class="go">比較表を見る <span class="arrow" aria-hidden="true">→</span></span>
+  </a>
+  {% endfor %}
+
+  <div class="tile tile-stat">
+    <p class="tile-eyebrow">掲載社数</p>
+    <p class="value">{{ total_count }}社</p>
+    <p class="label">{{ genres | length }}ジャンル合計</p>
   </div>
-</section>
+  {% if cheapest_row %}
+  <div class="tile tile-stat">
+    <p class="tile-eyebrow">最安値帯</p>
+    <p class="value">{{ "{:,}".format(cheapest_row.monthly_price) }}円〜</p>
+    <p class="label">{{ cheapest_row.service_name }}</p>
+  </div>
+  {% endif %}
+  <div class="tile tile-stat">
+    <p class="tile-eyebrow">価格帯比較</p>
+    <p class="value">LOW / MID / HIGH</p>
+    <p class="label">プラン別に比較できます</p>
+  </div>
+</div>
 
 {% if articles %}
-<section class="pickup-articles-section">
-  <h2>お役立ち記事</h2>
-  <div class="pickup-articles-grid">
-    {% for article in articles[:6] %}
-    <a class="pickup-article-card" href="{{ root }}articles/{{ article.slug }}">
-      <span class="pickup-article-title">{{ article.title }}</span>
-      <span class="pickup-article-date">{{ article.date }}</span>
-    </a>
-    {% endfor %}
+<section class="articles-panel">
+  <p class="articles-panel-title">お役立ち記事</p>
+  <div class="article-carousel">
+    <button type="button" class="carousel-nav carousel-prev" aria-label="前の記事" data-carousel-prev>‹</button>
+    <div class="article-track" data-carousel-track>
+      {% for article in articles %}
+      <a class="tile tile-article" href="{{ root }}articles/{{ article.slug }}">
+        <span class="headline">{{ article.title }}</span>
+        <span class="date">{{ article.date }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    <button type="button" class="carousel-nav carousel-next" aria-label="次の記事" data-carousel-next>›</button>
   </div>
   <a class="all-articles-link" href="{{ root }}articles/">お役立ち記事の一覧を見る →</a>
 </section>

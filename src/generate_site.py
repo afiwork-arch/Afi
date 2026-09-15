@@ -216,6 +216,14 @@ def build() -> None:
 
     # トップページ（ジャンル横断のハブページ）
     genre_counts = {g["key"]: len([r for r in rows if r["genre"] == g["key"]]) for g in genres}
+    genre_samples = {
+        g["key"]: [r["service_name"] for r in rows if r["genre"] == g["key"] and r.get("service_name")][:5]
+        for g in genres
+    }
+    priced_rows = [
+        r for r in rows if isinstance(r.get("monthly_price"), (int, float)) and r.get("monthly_price")
+    ]
+    cheapest_row = min(priced_rows, key=lambda r: r["monthly_price"]) if priced_rows else None
     home_tpl = env.get_template("home.html")
     (OUTPUT_DIR / "index.html").write_text(
         home_tpl.render(
@@ -223,7 +231,11 @@ def build() -> None:
             site_url=SITE_BASE_URL,
             genres=genres,
             genre_counts=genre_counts,
+            genre_samples=genre_samples,
+            total_count=len(rows),
+            cheapest_row=cheapest_row,
             articles=articles,
+            generated_at=generated_at,
             root="",
             canonical_url=f"{SITE_BASE_URL}/",
         ),
