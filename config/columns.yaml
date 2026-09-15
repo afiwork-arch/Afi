@@ -1,7 +1,10 @@
 # スプレッドシート／JSONの列（比較項目）定義。
 # 1シートに複数ジャンルの行を混在させ、各行の genre 列でどのジャンルに属するか管理する
 # （ジャンルごとに別ファイル/別シートには分けない）。generate_site.py が genres の数だけ
-# 比較ページを生成する（例: server → public/index.html, vpn → public/vpn/index.html）。
+# 比較ページを生成する（例: server → public/server/index.html, vpn → public/vpn/index.html）。
+# サイトのトップページ（public/index.html）はジャンル横断のハブページで、
+# templates/home.html が担当する（2026-09-15、ジャンルが増える前提でルート直下から
+# 各ジャンルの比較表を追い出した。詳細はCLAUDE.mdの「トップページ（ハブページ）」参照）。
 #
 # type: manual  → 各社公式サイトを見て人が入力・更新する列
 # type: asp     → ASPクライアントが埋める列（提携リンク・ASP側の商品データなど）
@@ -15,10 +18,13 @@
 # 診断ツール/tier-toolbar/スペック列・SSL列/FAQ/もっと詳しく知りたい方へ）に
 # そのジャンル向けの文言・要否を追記すること。分岐が無いまま genres に足すと
 # レンタルサーバー向けの文言がそのまま出てしまう。詳細はCLAUDE.mdの「ジャンル横展開」参照。
+# path は必ず末尾スラッシュ付きの空でない文字列にすること（全ジャンルの比較表はハブページ
+# の配下に置く方針。かつてserverのみpath: ""でルート直下に置いていたが、articles/*.md内の
+# 「../index」的な相対リンクが将来ジャンルが増えるほど誤解を招くため2026-09-15に廃止）。
 genres:
   - key: server
     label: レンタルサーバー
-    path: ""
+    path: "server/"
   - key: vpn
     label: VPN
     path: "vpn/"

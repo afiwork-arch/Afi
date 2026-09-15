@@ -207,7 +207,23 @@ def build() -> None:
     ):
         shutil.copy(TEMPLATES_DIR / asset, OUTPUT_DIR / asset)
 
-    # 比較表ページ（ジャンルごとに1ページ。例: server→public/index.html, vpn→public/vpn/index.html）
+    # トップページ（ジャンル横断のハブページ）
+    genre_counts = {g["key"]: len([r for r in rows if r["genre"] == g["key"]]) for g in genres}
+    home_tpl = env.get_template("home.html")
+    (OUTPUT_DIR / "index.html").write_text(
+        home_tpl.render(
+            site_title=SITE_TITLE,
+            site_url=SITE_BASE_URL,
+            genres=genres,
+            genre_counts=genre_counts,
+            articles=articles,
+            root="",
+            canonical_url=f"{SITE_BASE_URL}/",
+        ),
+        encoding="utf-8",
+    )
+
+    # 比較表ページ（ジャンルごとに1ページ。例: server→public/server/index.html, vpn→public/vpn/index.html）
     index_tpl = env.get_template("index.html")
     for g in genres:
         genre_rows = [r for r in rows if r["genre"] == g["key"]]
