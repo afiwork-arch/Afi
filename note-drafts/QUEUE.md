@@ -41,8 +41,8 @@
 |---|------|------|--------|--------|-------|--------|
 | 1 | 主要7社の「更新後の料金」を調べて表にした | renewal-price | renewal-price.md | 下書き済み | 2026-08_renewal-price-announce.md | 未 |
 | 2 | 「月額◯円〜」で選ぶと後で困る話（選び方3ポイント） | choosing | how-to-choose.md / hidden-costs.md | 下書き済み | 2026-08_rental-server-choosing.md | 未 |
-| 3 | 自動バックアップ「無料標準」か「有料オプション」か 各社の違い | backup-diff | how-to-choose.md / lolipop-vs-sakura.md | 未着手 | | |
-| 4 | レンタルサーバーの「初期費用」は本当に無料？各社の実態 | setup-fee | hidden-costs.md | 未着手 | | |
+| 3 | 自動バックアップ「無料標準」か「有料オプション」か 各社の違い | backup-diff | how-to-choose.md / lolipop-vs-sakura.md | 下書き済み | 2026-09-01_backup-diff.md | 未 |
+| 4 | レンタルサーバーの「初期費用」は本当に無料？各社の実態 | setup-fee | hidden-costs.md | 下書き済み | 2026-09-15_setup-fee.md | 未 |
 | 5 | 3年契約 vs 1年契約、どっちが得？更新後料金で考える | contract-term | renewal-price.md / hidden-costs.md | 未着手 | | |
 | 6 | 独自ドメイン「永久無料」特典の落とし穴 | domain-perk | hidden-costs.md | 未着手 | | |
 | 7 | ブログを始めるのにディスク容量は何GB必要？ | disk-capacity | how-to-choose.md | 未着手 | | |
