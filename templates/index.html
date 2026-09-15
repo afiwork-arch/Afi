@@ -115,7 +115,13 @@
 </section>
 
 <section class="compare">
-  <h2>{{ genre }}比較表</h2>
+  <h2 class="section-title">{{ genre }}比較表</h2>
+  {% set ns = namespace(min_low=none, min_mid=none, min_high=none) %}
+  {% for r in rows %}
+    {% if r.get('_price_sort') is not none and r.get('_price_sort') < 999999999 and (ns.min_low is none or r.get('_price_sort') < ns.min_low) %}{% set ns.min_low = r.get('_price_sort') %}{% endif %}
+    {% if r.get('_price_sort_mid') is not none and r.get('_price_sort_mid') < 999999999 and (ns.min_mid is none or r.get('_price_sort_mid') < ns.min_mid) %}{% set ns.min_mid = r.get('_price_sort_mid') %}{% endif %}
+    {% if r.get('_price_sort_high') is not none and r.get('_price_sort_high') < 999999999 and (ns.min_high is none or r.get('_price_sort_high') < ns.min_high) %}{% set ns.min_high = r.get('_price_sort_high') %}{% endif %}
+  {% endfor %}
   {% if genre_key == "server" %}
   <div class="tier-toolbar" id="tier-toolbar">
     <span class="sort-label">表示するプラン:</span>
@@ -167,6 +173,7 @@
           data-disk-high="{{ row.get('_disk_sort_high') }}"
           data-order="{{ loop.index0 }}">
           <td data-label="サービス" class="col-service">
+            <span class="cell-rank" aria-hidden="true"></span>
             <div class="cell-service-name">{{ row.get("service_name") }}</div>
             {% if row.get("company") %}<div class="cell-company">{{ row.get("company") }}</div>{% endif %}
             {% if row.get("recommend_comment") %}<p class="cell-comment">{{ row.get("recommend_comment") }}</p>{% endif %}
@@ -177,10 +184,13 @@
             {% set price = row.get("monthly_price" ~ suffix) %}
             {% set fee = row.get("setup_fee" ~ suffix) %}
             {% set plan_name = row.get("plan_name" ~ suffix) %}
-            <div class="tier-variant" data-tier="{{ tier }}"{% if tier != "low" %} hidden{% endif %}>
+            {% set price_sort = row.get("_price_sort" ~ suffix) %}
+            {% set tier_min = {"low": ns.min_low, "mid": ns.min_mid, "high": ns.min_high}[tier] %}
+            {% set is_best = tier_min is not none and price_sort is not none and price_sort == tier_min %}
+            <div class="tier-variant{% if is_best %} is-best{% endif %}" data-tier="{{ tier }}"{% if tier != "low" %} hidden{% endif %}>
               {% if plan_name %}<div class="cell-plan-name">{{ plan_name }}</div>{% endif %}
               {% if price is not none and price != "" %}
-                <span class="price">{{ price }}<small>円/月〜</small></span>
+                <span class="price">{{ price }}<small>円/月〜</small></span>{% if is_best %}<span class="best-badge">最安</span>{% endif %}
               {% else %}―{% endif %}
               {% if fee is not none and fee != "" %}
                 <div class="cell-subtext">初期費用 {{ fee }}円</div>
@@ -208,7 +218,13 @@
             </div>
             {% endfor %}
           </td>
-          <td data-label="無料SSL" class="col-ssl">{{ row.get("free_ssl") or "-" }}</td>
+          <td data-label="無料SSL" class="col-ssl">
+            {% if row.get("free_ssl") %}
+            <span class="ssl-yes"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ row.get("free_ssl") }}</span>
+            {% else %}
+            <span class="ssl-none">―</span>
+            {% endif %}
+          </td>
           {% endif %}
           <td data-label="公式サイト" class="col-cta">
             <a class="cta cta-small" href="{{ row.get('affiliate_link') or row.get('official_url') or '#' }}"
@@ -232,7 +248,7 @@
 
 {% set review_rows = rows | selectattr("detail_review") | selectattr("slug") | list %}
 <section class="reviews">
-  <h2>各社の特徴を詳しく</h2>
+  <h2 class="section-title">各社の特徴を詳しく</h2>
 
   <div class="review-select-wrap">
     <label class="review-select-label" for="review-select">企業を選択</label>
@@ -259,67 +275,71 @@
 
 {% if genre_key == "server" %}
 <section class="faq">
-  <h2>よくある質問</h2>
-  <div class="faq-item">
-    <p class="faq-q">Q. レンタルサーバーとドメインは別々に契約する必要がありますか？</p>
+  <h2 class="section-title">よくある質問</h2>
+  <div class="faq-list">
+  <details class="faq-item">
+    <summary class="faq-q"><span>Q. レンタルサーバーとドメインは別々に契約する必要がありますか？</span></summary>
     <p class="faq-a">A. 別々でも契約できますが、初めての方は同じ会社でまとめて契約すると管理が簡単です。
       詳しくは<span class="kw">「<a href="{{ root }}articles/how-to-start-wordpress">WordPressブログの始め方</a>」</span>で解説しています。</p>
-  </div>
-  <div class="faq-item">
-    <p class="faq-q">Q. 共用サーバーとVPSはどちらを選べばいいですか？</p>
+  </details>
+  <details class="faq-item">
+    <summary class="faq-q"><span>Q. 共用サーバーとVPSはどちらを選べばいいですか？</span></summary>
     <p class="faq-a">A. 初めての方は共用サーバーで十分なケースがほとんどです。違いは
       <span class="kw">「<a href="{{ root }}articles/shared-vs-vps">共用サーバーとVPSの違い</a>」</span>で解説しています。</p>
-  </div>
-  <div class="faq-item">
-    <p class="faq-q">Q. 表示されている月額料金は、ずっとこの金額ですか？</p>
+  </details>
+  <details class="faq-item">
+    <summary class="faq-q"><span>Q. 表示されている月額料金は、ずっとこの金額ですか？</span></summary>
     <p class="faq-a">A. 多くの場合、初回契約時の割引価格です。更新後の料金については
       <span class="kw">「<a href="{{ root }}articles/hidden-costs">見落としがちな更新料金の注意点</a>」</span>で解説しています。</p>
-  </div>
-  <div class="faq-item">
-    <p class="faq-q">Q. 今使っているサーバーから乗り換えることはできますか？</p>
+  </details>
+  <details class="faq-item">
+    <summary class="faq-q"><span>Q. 今使っているサーバーから乗り換えることはできますか？</span></summary>
     <p class="faq-a">A. 多くの会社が移転サポートを用意しています。詳しくは
       <span class="kw">「<a href="{{ root }}articles/server-migration">サーバーの乗り換えは難しい？</a>」</span>をご覧ください。</p>
+  </details>
   </div>
 </section>
 
 <section class="more-articles">
-  <h2>もっと詳しく知りたい方へ</h2>
+  <h2 class="section-title">もっと詳しく知りたい方へ</h2>
   <div class="more-articles-grid">
-    <a href="{{ root }}articles/xserver-vs-conoha-wing">エックスサーバーとConoHa WINGを比較</a>
-    <a href="{{ root }}articles/xserver-vs-sakura">エックスサーバーとさくらのレンタルサーバーを比較</a>
-    <a href="{{ root }}articles/lolipop-vs-sakura">ロリポップとさくらのレンタルサーバを比較</a>
-    <a href="{{ root }}articles/site-speed">サイトの表示速度はサーバーで変わる？</a>
-    <a href="{{ root }}articles/security-checklist">セキュリティ機能で確認すべき5つのポイント</a>
-    <a href="{{ root }}articles/free-trial">無料お試し期間・返金保証は使うべき？</a>
-    <a href="{{ root }}articles/sakura-review">さくらのレンタルサーバーの評判・プラン別料金</a>
-    <a href="{{ root }}articles/lolipop-vs-conoha-wing">ロリポップとConoHa WINGを比較</a>
+    <a href="{{ root }}articles/xserver-vs-conoha-wing"><span>エックスサーバーとConoHa WINGを比較</span></a>
+    <a href="{{ root }}articles/xserver-vs-sakura"><span>エックスサーバーとさくらのレンタルサーバーを比較</span></a>
+    <a href="{{ root }}articles/lolipop-vs-sakura"><span>ロリポップとさくらのレンタルサーバを比較</span></a>
+    <a href="{{ root }}articles/site-speed"><span>サイトの表示速度はサーバーで変わる？</span></a>
+    <a href="{{ root }}articles/security-checklist"><span>セキュリティ機能で確認すべき5つのポイント</span></a>
+    <a href="{{ root }}articles/free-trial"><span>無料お試し期間・返金保証は使うべき？</span></a>
+    <a href="{{ root }}articles/sakura-review"><span>さくらのレンタルサーバーの評判・プラン別料金</span></a>
+    <a href="{{ root }}articles/lolipop-vs-conoha-wing"><span>ロリポップとConoHa WINGを比較</span></a>
   </div>
   <a class="all-articles-link" href="{{ root }}articles/">お役立ち記事の一覧を見る →</a>
 </section>
 {% else %}
 <section class="faq">
-  <h2>よくある質問</h2>
-  <div class="faq-item">
-    <p class="faq-q">Q. VPNは無料のものではだめなのですか？</p>
+  <h2 class="section-title">よくある質問</h2>
+  <div class="faq-list">
+  <details class="faq-item">
+    <summary class="faq-q"><span>Q. VPNは無料のものではだめなのですか？</span></summary>
     <p class="faq-a">A. 無料VPNは通信速度が遅い、ログが収集される、広告が表示されるなどの
       デメリットがあることが多く、安全性・快適さを重視するなら有料サービスがおすすめです。</p>
-  </div>
-  <div class="faq-item">
-    <p class="faq-q">Q. 表示されている月額料金は、ずっとこの金額ですか？</p>
+  </details>
+  <details class="faq-item">
+    <summary class="faq-q"><span>Q. 表示されている月額料金は、ずっとこの金額ですか？</span></summary>
     <p class="faq-a">A. 契約期間によって割引が適用され、初回契約時と更新後で金額が異なる
       サービスがあります。契約前に更新後の料金も確認しておくと安心です。</p>
-  </div>
-  <div class="faq-item">
-    <p class="faq-q">Q. 同時に何台の端末で使えますか？</p>
+  </details>
+  <details class="faq-item">
+    <summary class="faq-q"><span>Q. 同時に何台の端末で使えますか？</span></summary>
     <p class="faq-a">A. サービスによって上限が異なります(無制限のサービスもあります)。
       複数端末で使いたい場合は事前に確認してください。</p>
+  </details>
   </div>
 </section>
 
 <section class="more-articles">
-  <h2>もっと詳しく知りたい方へ</h2>
+  <h2 class="section-title">もっと詳しく知りたい方へ</h2>
   <div class="more-articles-grid">
-    <a href="{{ root }}articles/sekai-vpn-vs-millenvpn">セカイVPNとMillenVPNを比較</a>
+    <a href="{{ root }}articles/sekai-vpn-vs-millenvpn"><span>セカイVPNとMillenVPNを比較</span></a>
   </div>
   <a class="all-articles-link" href="{{ root }}articles/">お役立ち記事の一覧を見る →</a>
 </section>
