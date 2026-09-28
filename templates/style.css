@@ -108,6 +108,18 @@ main {
   flex: 1 0 auto;
 }
 
+/* ステマ規制(景品表示法)対応。消費者庁のQ&Aが「冒頭」での明示を求めているため、
+   フッターの開示文とは別に全ページ共通でmain直下(コンテンツの一番上)に置く。
+   2026-09-15にAI感対策で撤去した.pr-barの再来にならないよう、色面のバーではなく
+   文字のみの1行に留める。 */
+.pr-notice {
+  margin: 0.85rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.pr-notice a { color: var(--muted); }
+
 h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.9rem, 4.6vw, 2.6rem); line-height: 1; margin-bottom: 0.5rem; }
 h2 { font-size: 1.35rem; margin: 0 0 1rem; }
 h3 { font-size: 1.1rem; margin: 0 0 0.4rem; }
